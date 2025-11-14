@@ -10,25 +10,53 @@ const { text, label = "Leer", className = "" } = Astro.props;
 const escapedText = text.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, ' ');
 ---
 
-<button
-  type="button"
-  class={`btn-speech inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 transition-colors font-semibold text-lg ${className}`}
-  data-text={text}
-  aria-label={`${label}: ${text.substring(0, 50)}...`}
->
-  <span class="text-2xl" aria-hidden="true">🔊</span>
-  <span>{label}</span>
-</button>
+<div class="inline-flex gap-2">
+  <button
+    type="button"
+    class={`btn-speech inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 transition-colors font-semibold text-lg ${className}`}
+    data-text={text}
+    aria-label={`${label}: ${text.substring(0, 50)}...`}
+  >
+    <span class="text-2xl" aria-hidden="true">🔊</span>
+    <span>{label}</span>
+  </button>
+
+  <button
+    type="button"
+    class="btn-stop-speech hidden items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-colors font-semibold text-lg"
+    aria-label="Detener audio"
+  >
+    <span class="text-2xl" aria-hidden="true">⏹️</span>
+    <span>Detener</span>
+  </button>
+</div>
 
 <script>
-  import { speechRead, speechStop, initSpeech } from '../lib/speech';
+  import { speechRead, speechStop, initSpeech, isSpeaking } from '../lib/speech';
 
   // Inicializar Web Speech API
   initSpeech();
 
+  // Función para actualizar el estado de los botones
+  function updateButtons() {
+    const speaking = isSpeaking();
+    const stopButtons = document.querySelectorAll('.btn-stop-speech');
+    
+    stopButtons.forEach(btn => {
+      if (speaking) {
+        btn.classList.remove('hidden');
+        btn.classList.add('inline-flex');
+      } else {
+        btn.classList.add('hidden');
+        btn.classList.remove('inline-flex');
+      }
+    });
+  }
+
   // Agregar listeners a todos los botones de speech
   document.addEventListener('DOMContentLoaded', () => {
     const buttons = document.querySelectorAll('.btn-speech');
+    const stopButtons = document.querySelectorAll('.btn-stop-speech');
     
     buttons.forEach(button => {
       button.addEventListener('click', (e) => {
@@ -38,7 +66,27 @@ const escapedText = text.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g
         if (text) {
           speechStop();
           speechRead(text);
+          
+          // Esperar un momento para que comience a hablar
+          setTimeout(() => {
+            updateButtons();
+          }, 100);
+          
+          // Actualizar botones periódicamente mientras habla
+          const interval = setInterval(() => {
+            updateButtons();
+            if (!isSpeaking()) {
+              clearInterval(interval);
+            }
+          }, 500);
         }
+      });
+    });
+
+    stopButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        speechStop();
+        updateButtons();
       });
     });
   });
