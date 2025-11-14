@@ -21,20 +21,41 @@ const {
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
+    
+    <!-- Script inline para evitar flash de contenido -->
+    <script is:inline>
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+        
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
   </head>
-  <body class="min-h-screen bg-gray-50 text-gray-900 flex flex-col">
-    <!-- Skip link para accesibilidad -->
-    <a href="#contenido" class="skip-link">
-      Saltar al contenido principal
-    </a>
-
-    <header class="bg-blue-700 text-white shadow-lg">
+  <body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col transition-colors duration-300">
+    <header class="sticky top-0 z-50 bg-blue-700 dark:bg-blue-900 text-white shadow-lg transition-colors duration-300">
       <div class="container mx-auto px-4 py-6">
-        <nav>
+        <nav class="flex justify-between items-center">
           <a href="/" class="inline-flex items-center gap-3 hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-blue-300 rounded-lg px-2 py-1">
             <span class="text-4xl" aria-hidden="true">📖</span>
             <h1 class="text-3xl font-bold">Biblia Accesible</h1>
           </a>
+          
+          <!-- Botón de modo nocturno -->
+          <button
+            id="theme-toggle"
+            type="button"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-800 hover:bg-blue-500 dark:hover:bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-300 transition-colors font-semibold"
+            aria-label="Cambiar modo de color"
+          >
+            <span id="theme-icon" class="text-2xl"></span>
+            <span id="theme-text" class="hidden sm:inline"></span>
+          </button>
         </nav>
       </div>
     </header>
@@ -43,11 +64,72 @@ const {
       <slot />
     </main>
 
-    <footer class="bg-gray-800 text-white mt-12">
+    <footer class="bg-gray-800 dark:bg-gray-950 text-white mt-12 transition-colors duration-300">
       <div class="container mx-auto px-4 py-6 text-center">
         <p class="text-lg">&copy; {new Date().getFullYear()} Biblia Accesible</p>
         <p class="text-sm text-gray-400 mt-2">Diseñado con accesibilidad para todos</p>
       </div>
     </footer>
+
+    <!-- Script para el toggle de tema -->
+    <script is:inline>
+      function updateThemeUI(isDark) {
+        const icon = document.getElementById('theme-icon');
+        const text = document.getElementById('theme-text');
+        
+        console.log('Actualizando UI, modo oscuro:', isDark);
+        
+        if (icon) {
+          icon.textContent = isDark ? '☀️' : '🌙';
+        }
+        if (text) {
+          text.textContent = isDark ? 'Modo Claro' : 'Modo Nocturno';
+        }
+      }
+
+      function toggleTheme() {
+        console.log('Toggle theme clickeado');
+        const html = document.documentElement;
+        const isDark = html.classList.contains('dark');
+        
+        console.log('Estado actual isDark:', isDark);
+        console.log('Clases antes:', html.className);
+        
+        if (isDark) {
+          html.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+          updateThemeUI(false);
+        } else {
+          html.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+          updateThemeUI(true);
+        }
+        
+        console.log('Clases después:', html.className);
+      }
+
+      function initTheme() {
+        const html = document.documentElement;
+        const isDark = html.classList.contains('dark');
+        
+        console.log('Inicializando tema, isDark:', isDark);
+        updateThemeUI(isDark);
+
+        const toggleBtn = document.getElementById('theme-toggle');
+        if (toggleBtn) {
+          console.log('Botón encontrado, asignando onclick');
+          toggleBtn.onclick = toggleTheme;
+        } else {
+          console.error('Botón NO encontrado');
+        }
+      }
+
+      // Inicializar cuando el DOM esté listo
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initTheme);
+      } else {
+        initTheme();
+      }
+    </script>
   </body>
 </html>

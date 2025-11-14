@@ -86,11 +86,11 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
     {libro && capitulo && (
       <div>
         <!-- Encabezado del capítulo -->
-        <header class="mb-8 text-center bg-blue-50 rounded-xl p-6 border-2 border-blue-200">
-          <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">
+        <header class="mb-8 text-center bg-blue-50 dark:bg-gray-800 rounded-xl p-6 border-2 border-blue-200 dark:border-blue-800">
+          <h1 class="text-4xl md:text-5xl font-bold text-gray-800 dark:text-gray-100 mb-2">
             {libro.nombre} {capituloNum}
           </h1>
-          <p class="text-xl text-gray-600">
+          <p class="text-xl text-gray-600 dark:text-gray-300">
             {capitulo.versiculos.length} {capitulo.versiculos.length === 1 ? 'versículo' : 'versículos'}
           </p>
         </header>
@@ -109,14 +109,14 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
           {capitulo.versiculos.map((versiculo) => (
             <article 
               id={`v${versiculo.numero}`}
-              class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border-l-4 border-blue-500"
+              class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border-l-4 border-blue-500 dark:border-blue-400"
             >
               <div class="flex items-start gap-4">
-                <span class="shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold" aria-label={`Versículo ${versiculo.numero}`}>
+                <span class="shrink-0 w-12 h-12 bg-blue-600 dark:bg-blue-700 text-white rounded-full flex items-center justify-center text-xl font-bold" aria-label={`Versículo ${versiculo.numero}`}>
                   {versiculo.numero}
                 </span>
                 <div class="flex-1">
-                  <p class="text-xl text-gray-800 leading-relaxed mb-4">
+                  <p class="text-xl text-gray-800 dark:text-gray-200 leading-relaxed mb-4">
                     {versiculo.texto}
                   </p>
                   <SpeechButton 

@@ -59,25 +59,25 @@ if (!libro && !error) {
       <div>
         <!-- Encabezado del libro -->
         <header class="mb-8 text-center">
-          <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+          <h1 class="text-4xl md:text-5xl font-bold text-gray-800 dark:text-gray-100 mb-4">
             {libro.nombre}
           </h1>
-          <p class="text-xl text-gray-600">
+          <p class="text-xl text-gray-600 dark:text-gray-300">
             {libro.capitulos.length} {libro.capitulos.length === 1 ? 'capítulo' : 'capítulos'}
           </p>
         </header>
 
         <!-- Lista de capítulos -->
         <section>
-          <h2 class="text-3xl font-bold mb-6 text-gray-800">Capítulos</h2>
+          <h2 class="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">Capítulos</h2>
           <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
             {libro.capitulos.map((capitulo) => (
               <a
                 href={`/libro/${encodeURIComponent(libro.nombre)}/${capitulo.numero}`}
-                class="flex items-center justify-center bg-white rounded-xl shadow-md p-6 hover:shadow-xl hover:scale-110 transition-all border-2 border-transparent hover:border-blue-500 focus:border-blue-600 focus:ring-4 focus:ring-blue-300"
+                class="flex items-center justify-center bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-xl hover:scale-110 transition-all border-2 border-transparent hover:border-blue-500 dark:hover:border-blue-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-300"
                 aria-label={`Capítulo ${capitulo.numero}`}
               >
-                <span class="text-3xl font-bold text-blue-700">
+                <span class="text-3xl font-bold text-blue-700 dark:text-blue-400">
                   {capitulo.numero}
                 </span>
               </a>

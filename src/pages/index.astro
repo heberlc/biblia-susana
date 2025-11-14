@@ -24,10 +24,10 @@ try {
   <div class="max-w-6xl mx-auto">
     <!-- Sección de búsqueda -->
     <section class="mb-12 text-center spacing-wide">
-      <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gray-800">
+      <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gray-800 dark:text-gray-100">
         Bienvenido a la Biblia Accesible
       </h2>
-      <p class="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
+      <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
         Lee la Palabra de Dios con herramientas diseñadas para todos. 
         Busca, escucha y explora las Escrituras.
       </p>
@@ -41,7 +41,7 @@ try {
             id="searchInput"
             name="q"
             placeholder="Buscar versículos... (ej: amor, fe, esperanza)"
-            class="flex-1 px-6 py-4 text-xl border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-300 transition-colors"
+            class="flex-1 px-6 py-4 text-xl border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-300 transition-colors"
             required
           />
           <button
@@ -72,7 +72,7 @@ try {
     <!-- Lista de libros -->
     {!error && libros.length > 0 && (
       <section>
-        <h3 class="text-3xl font-bold mb-6 text-gray-800 text-center">
+        <h3 class="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">
           Libros de la Biblia
         </h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

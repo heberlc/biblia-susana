@@ -39,7 +39,7 @@ if (query.trim()) {
             name="q"
             value={query}
             placeholder="Buscar versículos..."
-            class="flex-1 px-6 py-4 text-xl border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-300 transition-colors"
+            class="flex-1 px-6 py-4 text-xl border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-300 transition-colors"
             required
             autofocus
           />
@@ -74,7 +74,7 @@ if (query.trim()) {
 
     {!error && query.trim() && (
       <section>
-        <h2 class="text-3xl font-bold mb-6 text-gray-800">
+        <h2 class="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">
           {resultados.length > 0 
             ? `${resultados.length} resultado${resultados.length !== 1 ? 's' : ''} para "${query}"`
             : `No se encontraron resultados para "${query}"`
@@ -84,9 +84,9 @@ if (query.trim()) {
         {resultados.length > 0 ? (
           <div class="space-y-6">
             {resultados.map((resultado) => (
-              <article class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border-l-4 border-blue-500">
+              <article class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border-l-4 border-blue-500 dark:border-blue-400">
                 <header class="mb-4">
-                  <h3 class="text-xl font-bold text-blue-700">
+                  <h3 class="text-xl font-bold text-blue-700 dark:text-blue-400">
                     <a 
                       href={`/libro/${encodeURIComponent(resultado.libro)}/${resultado.capitulo}`}
                       class="hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
@@ -96,7 +96,7 @@ if (query.trim()) {
                   </h3>
                 </header>
                 
-                <p class="text-lg text-gray-800 mb-4 leading-relaxed">
+                <p class="text-lg text-gray-800 dark:text-gray-200 mb-4 leading-relaxed">
                   {resultado.texto}
                 </p>
 
