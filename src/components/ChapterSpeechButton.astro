@@ -1,0 +1,162 @@
+---
+// Componente de botón avanzado para leer capítulo completo con pause
+interface Props {
+  text: string;
+  label?: string;
+  className?: string;
+}
+
+const { text, label = "Leer capítulo completo", className = "" } = Astro.props;
+---
+
+<div class="inline-flex gap-3 flex-wrap">
+  <button
+    type="button"
+    class="btn-play-chapter inline-flex items-center gap-2 px-8 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 transition-colors font-semibold text-xl shadow-lg"
+    data-text={text}
+    aria-label={label}
+  >
+    <span class="text-3xl" aria-hidden="true">▶️</span>
+    <span>{label}</span>
+  </button>
+
+  <button
+    type="button"
+    class="btn-pause-chapter hidden items-center gap-2 px-8 py-4 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 focus:ring-4 focus:ring-yellow-300 transition-colors font-semibold text-xl shadow-lg"
+    aria-label="Pausar"
+  >
+    <span class="text-3xl" aria-hidden="true">⏸️</span>
+    <span>Pausar</span>
+  </button>
+
+  <button
+    type="button"
+    class="btn-resume-chapter hidden items-center gap-2 px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors font-semibold text-xl shadow-lg"
+    aria-label="Continuar"
+  >
+    <span class="text-3xl" aria-hidden="true">▶️</span>
+    <span>Continuar</span>
+  </button>
+
+  <button
+    type="button"
+    class="btn-stop-chapter hidden items-center gap-2 px-8 py-4 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-colors font-semibold text-xl shadow-lg"
+    aria-label="Detener"
+  >
+    <span class="text-3xl" aria-hidden="true">⏹️</span>
+    <span>Detener</span>
+  </button>
+</div>
+
+<script>
+  import { speechRead, speechStop, speechPause, speechResume, isSpeaking, isPaused, initSpeech } from '../lib/speech';
+
+  // Inicializar Web Speech API
+  initSpeech();
+
+  // Estado de los controles
+  let updateInterval: number | null = null;
+
+  // Función para actualizar el estado de los botones
+  function updateChapterButtons() {
+    const speaking = isSpeaking();
+    const paused = isPaused();
+    
+    const playBtn = document.querySelector('.btn-play-chapter');
+    const pauseBtn = document.querySelector('.btn-pause-chapter');
+    const resumeBtn = document.querySelector('.btn-resume-chapter');
+    const stopBtn = document.querySelector('.btn-stop-chapter');
+
+    if (speaking && !paused) {
+      // Está hablando: mostrar pause y stop
+      playBtn?.classList.add('hidden');
+      pauseBtn?.classList.remove('hidden');
+      pauseBtn?.classList.add('inline-flex');
+      resumeBtn?.classList.add('hidden');
+      resumeBtn?.classList.remove('inline-flex');
+      stopBtn?.classList.remove('hidden');
+      stopBtn?.classList.add('inline-flex');
+    } else if (paused) {
+      // Está pausado: mostrar resume y stop
+      playBtn?.classList.add('hidden');
+      pauseBtn?.classList.add('hidden');
+      pauseBtn?.classList.remove('inline-flex');
+      resumeBtn?.classList.remove('hidden');
+      resumeBtn?.classList.add('inline-flex');
+      stopBtn?.classList.remove('hidden');
+      stopBtn?.classList.add('inline-flex');
+    } else {
+      // No está hablando: mostrar solo play
+      playBtn?.classList.remove('hidden');
+      pauseBtn?.classList.add('hidden');
+      pauseBtn?.classList.remove('inline-flex');
+      resumeBtn?.classList.add('hidden');
+      resumeBtn?.classList.remove('inline-flex');
+      stopBtn?.classList.add('hidden');
+      stopBtn?.classList.remove('inline-flex');
+    }
+  }
+
+  // Función para iniciar el monitoreo
+  function startMonitoring() {
+    if (updateInterval) {
+      clearInterval(updateInterval);
+    }
+    updateInterval = window.setInterval(() => {
+      updateChapterButtons();
+      if (!isSpeaking() && !isPaused()) {
+        if (updateInterval) {
+          clearInterval(updateInterval);
+          updateInterval = null;
+        }
+      }
+    }, 300);
+  }
+
+  // Agregar listeners
+  document.addEventListener('DOMContentLoaded', () => {
+    const playBtn = document.querySelector('.btn-play-chapter');
+    const pauseBtn = document.querySelector('.btn-pause-chapter');
+    const resumeBtn = document.querySelector('.btn-resume-chapter');
+    const stopBtn = document.querySelector('.btn-stop-chapter');
+
+    // Play
+    playBtn?.addEventListener('click', (e) => {
+      const target = e.currentTarget as HTMLButtonElement;
+      const text = target.dataset.text || target.getAttribute('data-text');
+      
+      if (text) {
+        speechStop();
+        speechRead(text);
+        
+        setTimeout(() => {
+          updateChapterButtons();
+          startMonitoring();
+        }, 100);
+      }
+    });
+
+    // Pause
+    pauseBtn?.addEventListener('click', () => {
+      speechPause();
+      updateChapterButtons();
+    });
+
+    // Resume
+    resumeBtn?.addEventListener('click', () => {
+      speechResume();
+      updateChapterButtons();
+      startMonitoring();
+    });
+
+    // Stop
+    stopBtn?.addEventListener('click', () => {
+      speechStop();
+      updateChapterButtons();
+      if (updateInterval) {
+        clearInterval(updateInterval);
+        updateInterval = null;
+      }
+    });
+  });
+</script>

@@ -38,9 +38,28 @@ export function speechStop(): void {
   }
 }
 
+// Pausar la lectura
+export function speechPause(): void {
+  if (speechSynthesis && speechSynthesis.speaking) {
+    speechSynthesis.pause();
+  }
+}
+
+// Reanudar la lectura
+export function speechResume(): void {
+  if (speechSynthesis && speechSynthesis.paused) {
+    speechSynthesis.resume();
+  }
+}
+
 // Verificar si está hablando
 export function isSpeaking(): boolean {
   return speechSynthesis ? speechSynthesis.speaking : false;
+}
+
+// Verificar si está pausado
+export function isPaused(): boolean {
+  return speechSynthesis ? speechSynthesis.paused : false;
 }
 
 // Reconocimiento de voz (búsqueda por voz)

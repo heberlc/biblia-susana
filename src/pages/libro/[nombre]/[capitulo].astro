@@ -1,6 +1,7 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
 import SpeechButton from "../../../components/SpeechButton.astro";
+import ChapterSpeechButton from "../../../components/ChapterSpeechButton.astro";
 import { loadBible } from "../../../lib/loadBible";
 import type { Libro, Capitulo } from "../../../types/bible";
 
@@ -96,10 +97,9 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
 
         <!-- Botón para leer todo el capítulo -->
         <div class="mb-8 flex justify-center">
-          <SpeechButton 
+          <ChapterSpeechButton 
             text={capitulo.versiculos.map(v => v.texto).join(' ')}
             label="Leer capítulo completo"
-            className="btn-large text-xl"
           />
         </div>
 
