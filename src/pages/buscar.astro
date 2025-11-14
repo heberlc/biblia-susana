@@ -1,0 +1,162 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SpeechButton from "../components/SpeechButton.astro";
+import { loadBible } from "../lib/loadBible";
+import { initializeSearch, buscar } from "../lib/search";
+import type { ResultadoBusqueda } from "../types/bible";
+
+// Obtener el parámetro de búsqueda
+const query = Astro.url.searchParams.get('q') || '';
+
+let resultados: ResultadoBusqueda[] = [];
+let error = false;
+
+if (query.trim()) {
+  try {
+    const biblia = await loadBible();
+    initializeSearch(biblia);
+    resultados = buscar(query);
+  } catch (e) {
+    console.error('Error en la búsqueda:', e);
+    error = true;
+  }
+}
+---
+
+<Layout 
+  title={`Buscar: ${query} - Biblia Accesible`}
+  description={`Resultados de búsqueda para "${query}" en la Biblia`}
+>
+  <div class="max-w-5xl mx-auto">
+    <!-- Formulario de búsqueda -->
+    <section class="mb-8">
+      <form action="/buscar" method="get" class="mb-6">
+        <div class="flex flex-col md:flex-row gap-4">
+          <label for="searchInput" class="sr-only">Buscar en la Biblia</label>
+          <input
+            type="search"
+            id="searchInput"
+            name="q"
+            value={query}
+            placeholder="Buscar versículos..."
+            class="flex-1 px-6 py-4 text-xl border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-300 transition-colors"
+            required
+            autofocus
+          />
+          <button
+            type="submit"
+            class="btn-large bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors shadow-lg px-8"
+          >
+            <span class="text-2xl mr-2" aria-hidden="true">🔍</span>
+            Buscar
+          </button>
+        </div>
+      </form>
+
+      <div class="flex justify-center gap-4">
+        <a
+          href="/"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 transition-colors font-semibold text-lg"
+        >
+          <span class="text-xl" aria-hidden="true">🏠</span>
+          Volver al Inicio
+        </a>
+      </div>
+    </section>
+
+    <!-- Resultados -->
+    {error && (
+      <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-6 rounded-lg" role="alert">
+        <p class="font-bold text-xl mb-2">Error en la búsqueda</p>
+        <p class="text-lg">No se pudo realizar la búsqueda. Intenta de nuevo.</p>
+      </div>
+    )}
+
+    {!error && query.trim() && (
+      <section>
+        <h2 class="text-3xl font-bold mb-6 text-gray-800">
+          {resultados.length > 0 
+            ? `${resultados.length} resultado${resultados.length !== 1 ? 's' : ''} para "${query}"`
+            : `No se encontraron resultados para "${query}"`
+          }
+        </h2>
+
+        {resultados.length > 0 ? (
+          <div class="space-y-6">
+            {resultados.map((resultado) => (
+              <article class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border-l-4 border-blue-500">
+                <header class="mb-4">
+                  <h3 class="text-xl font-bold text-blue-700">
+                    <a 
+                      href={`/libro/${encodeURIComponent(resultado.libro)}/${resultado.capitulo}`}
+                      class="hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                    >
+                      {resultado.libro} {resultado.capitulo}:{resultado.versiculo}
+                    </a>
+                  </h3>
+                </header>
+                
+                <p class="text-lg text-gray-800 mb-4 leading-relaxed">
+                  {resultado.texto}
+                </p>
+
+                <div class="flex gap-4">
+                  <SpeechButton 
+                    text={`${resultado.libro} ${resultado.capitulo} ${resultado.versiculo}. ${resultado.texto}`}
+                    label="Escuchar"
+                    className="text-base"
+                  />
+                  <a
+                    href={`/libro/${encodeURIComponent(resultado.libro)}/${resultado.capitulo}`}
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 focus:ring-4 focus:ring-blue-300 transition-colors font-semibold"
+                  >
+                    Ver capítulo completo
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg">
+            <p class="font-bold text-xl mb-2">Sin resultados</p>
+            <p class="text-lg">
+              Intenta con otros términos de búsqueda o verifica la ortografía.
+            </p>
+          </div>
+        )}
+      </section>
+    )}
+
+    {!query.trim() && (
+      <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-6 rounded-lg text-center">
+        <p class="font-bold text-xl mb-2">Búsqueda en la Biblia</p>
+        <p class="text-lg">
+          Ingresa un término para buscar en todos los versículos de la Biblia.
+        </p>
+      </div>
+    )}
+  </div>
+</Layout>
+
+<style>
+  article {
+    animation: slideIn 0.3s ease-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    article {
+      animation: none;
+    }
+  }
+</style>

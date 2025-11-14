@@ -1,16 +1,110 @@
 ---
+import Layout from "../layouts/Layout.astro";
+import LibroCard from "../components/LibroCard.astro";
+import VoiceSearch from "../components/VoiceSearch.astro";
+import { loadBible } from "../lib/loadBible";
+import type { Libro } from "../types/bible";
 
+let libros: Libro[] = [];
+let error = false;
+
+try {
+  const biblia = await loadBible();
+  libros = biblia.libros;
+} catch (e) {
+  console.error('Error al cargar la Biblia:', e);
+  error = true;
+}
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout 
+  title="Biblia Accesible - Inicio"
+  description="Lee y estudia la Biblia con herramientas accesibles: búsqueda por voz, lectura en voz alta y diseño para todos"
+>
+  <div class="max-w-6xl mx-auto">
+    <!-- Sección de búsqueda -->
+    <section class="mb-12 text-center spacing-wide">
+      <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gray-800">
+        Bienvenido a la Biblia Accesible
+      </h2>
+      <p class="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
+        Lee la Palabra de Dios con herramientas diseñadas para todos. 
+        Busca, escucha y explora las Escrituras.
+      </p>
+
+      <!-- Formulario de búsqueda -->
+      <form action="/buscar" method="get" class="mb-8">
+        <div class="flex flex-col md:flex-row gap-4 max-w-3xl mx-auto">
+          <label for="searchInput" class="sr-only">Buscar en la Biblia</label>
+          <input
+            type="search"
+            id="searchInput"
+            name="q"
+            placeholder="Buscar versículos... (ej: amor, fe, esperanza)"
+            class="flex-1 px-6 py-4 text-xl border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-300 transition-colors"
+            required
+          />
+          <button
+            type="submit"
+            class="btn-large bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors shadow-lg px-8"
+          >
+            <span class="text-2xl mr-2" aria-hidden="true">🔍</span>
+            Buscar
+          </button>
+        </div>
+      </form>
+
+      <!-- Búsqueda por voz -->
+      <VoiceSearch className="mb-8" />
+    </section>
+
+    <!-- Mensaje de error -->
+    {error && (
+      <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-6 rounded-lg mb-8" role="alert">
+        <p class="font-bold text-xl mb-2">Error al cargar la Biblia</p>
+        <p class="text-lg">
+          No se pudo cargar el contenido. Verifica que el archivo 
+          <code class="bg-red-200 px-2 py-1 rounded">public/data/biblia.json</code> exista.
+        </p>
+      </div>
+    )}
+
+    <!-- Lista de libros -->
+    {!error && libros.length > 0 && (
+      <section>
+        <h3 class="text-3xl font-bold mb-6 text-gray-800 text-center">
+          Libros de la Biblia
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {libros.map((libro) => (
+            <LibroCard
+              nombre={libro.nombre}
+              numCapitulos={libro.capitulos.length}
+              href={`/libro/${encodeURIComponent(libro.nombre)}`}
+            />
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</Layout>
+
+<style>
+  /* Animación suave para las tarjetas (respeta prefers-reduced-motion) */
+  @media (prefers-reduced-motion: no-preference) {
+    .grid > * {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

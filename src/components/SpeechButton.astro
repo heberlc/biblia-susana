@@ -1,0 +1,45 @@
+---
+// Componente de botón para leer texto en voz alta
+interface Props {
+  text: string;
+  label?: string;
+  className?: string;
+}
+
+const { text, label = "Leer", className = "" } = Astro.props;
+const escapedText = text.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, ' ');
+---
+
+<button
+  type="button"
+  class={`btn-speech inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 transition-colors font-semibold text-lg ${className}`}
+  data-text={text}
+  aria-label={`${label}: ${text.substring(0, 50)}...`}
+>
+  <span class="text-2xl" aria-hidden="true">🔊</span>
+  <span>{label}</span>
+</button>
+
+<script>
+  import { speechRead, speechStop, initSpeech } from '../lib/speech';
+
+  // Inicializar Web Speech API
+  initSpeech();
+
+  // Agregar listeners a todos los botones de speech
+  document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll('.btn-speech');
+    
+    buttons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        const text = target.dataset.text || target.getAttribute('data-text');
+        
+        if (text) {
+          speechStop();
+          speechRead(text);
+        }
+      });
+    });
+  });
+</script>

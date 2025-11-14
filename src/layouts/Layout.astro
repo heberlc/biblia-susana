@@ -1,0 +1,53 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { 
+  title = "Biblia App - Lee la Palabra de Dios", 
+  description = "Aplicación accesible para leer y estudiar la Biblia en español" 
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen bg-gray-50 text-gray-900 flex flex-col">
+    <!-- Skip link para accesibilidad -->
+    <a href="#contenido" class="skip-link">
+      Saltar al contenido principal
+    </a>
+
+    <header class="bg-blue-700 text-white shadow-lg">
+      <div class="container mx-auto px-4 py-6">
+        <nav>
+          <a href="/" class="inline-flex items-center gap-3 hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-blue-300 rounded-lg px-2 py-1">
+            <span class="text-4xl" aria-hidden="true">📖</span>
+            <h1 class="text-3xl font-bold">Biblia Accesible</h1>
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenido" class="flex-1 container mx-auto px-4 py-8">
+      <slot />
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-12">
+      <div class="container mx-auto px-4 py-6 text-center">
+        <p class="text-lg">&copy; {new Date().getFullYear()} Biblia Accesible</p>
+        <p class="text-sm text-gray-400 mt-2">Diseñado con accesibilidad para todos</p>
+      </div>
+    </footer>
+  </body>
+</html>

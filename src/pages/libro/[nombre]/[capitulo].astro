@@ -1,0 +1,195 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import SpeechButton from "../../../components/SpeechButton.astro";
+import { loadBible } from "../../../lib/loadBible";
+import type { Libro, Capitulo } from "../../../types/bible";
+
+// Generar rutas estáticas para todos los capítulos de todos los libros
+export async function getStaticPaths() {
+  const biblia = await loadBible();
+  const paths = [];
+  
+  for (const libro of biblia.libros) {
+    for (const capitulo of libro.capitulos) {
+      paths.push({
+        params: { 
+          nombre: libro.nombre,
+          capitulo: capitulo.numero.toString()
+        },
+      });
+    }
+  }
+  
+  return paths;
+}
+
+// Obtener parámetros de la URL
+const { nombre, capitulo: capituloNumStr } = Astro.params;
+const capituloNum = parseInt(capituloNumStr || '1', 10);
+
+let libro: Libro | undefined;
+let capitulo: Capitulo | undefined;
+let error = false;
+
+try {
+  const biblia = await loadBible();
+  libro = biblia.libros.find(l => l.nombre === nombre);
+  if (libro) {
+    capitulo = libro.capitulos.find(c => c.numero === capituloNum);
+  }
+} catch (e) {
+  console.error('Error al cargar el capítulo:', e);
+  error = true;
+}
+
+// Si no se encuentra, redirigir
+if ((!libro || !capitulo) && !error) {
+  return Astro.redirect('/404');
+}
+
+// Capítulos anterior y siguiente para navegación
+const capituloAnterior = libro && capituloNum > 1 ? capituloNum - 1 : null;
+const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capituloNum + 1 : null;
+---
+
+<Layout 
+  title={`${libro?.nombre} ${capituloNum} - Biblia Accesible`}
+  description={`Lee ${libro?.nombre} capítulo ${capituloNum} de la Biblia`}
+>
+  <div class="max-w-4xl mx-auto">
+    <!-- Navegación superior -->
+    <nav class="mb-8 flex flex-wrap gap-4" aria-label="Navegación">
+      <a
+        href="/"
+        class="inline-flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 transition-colors font-semibold text-lg"
+      >
+        <span class="text-xl" aria-hidden="true">🏠</span>
+        Inicio
+      </a>
+      <a
+        href={`/libro/${encodeURIComponent(nombre || '')}`}
+        class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors font-semibold text-lg"
+      >
+        <span class="text-xl" aria-hidden="true">📖</span>
+        {libro?.nombre}
+      </a>
+    </nav>
+
+    {error && (
+      <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-6 rounded-lg" role="alert">
+        <p class="font-bold text-xl mb-2">Error al cargar el capítulo</p>
+        <p class="text-lg">No se pudo cargar el contenido. Intenta de nuevo.</p>
+      </div>
+    )}
+
+    {libro && capitulo && (
+      <div>
+        <!-- Encabezado del capítulo -->
+        <header class="mb-8 text-center bg-blue-50 rounded-xl p-6 border-2 border-blue-200">
+          <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">
+            {libro.nombre} {capituloNum}
+          </h1>
+          <p class="text-xl text-gray-600">
+            {capitulo.versiculos.length} {capitulo.versiculos.length === 1 ? 'versículo' : 'versículos'}
+          </p>
+        </header>
+
+        <!-- Botón para leer todo el capítulo -->
+        <div class="mb-8 flex justify-center">
+          <SpeechButton 
+            text={capitulo.versiculos.map(v => v.texto).join(' ')}
+            label="Leer capítulo completo"
+            className="btn-large text-xl"
+          />
+        </div>
+
+        <!-- Lista de versículos -->
+        <section class="space-y-6 mb-12">
+          <h2 class="sr-only">Versículos</h2>
+          {capitulo.versiculos.map((versiculo) => (
+            <article 
+              id={`v${versiculo.numero}`}
+              class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border-l-4 border-blue-500"
+            >
+              <div class="flex items-start gap-4">
+                <span class="shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold" aria-label={`Versículo ${versiculo.numero}`}>
+                  {versiculo.numero}
+                </span>
+                <div class="flex-1">
+                  <p class="text-xl text-gray-800 leading-relaxed mb-4">
+                    {versiculo.texto}
+                  </p>
+                  <SpeechButton 
+                    text={`${libro.nombre} ${capituloNum} ${versiculo.numero}. ${versiculo.texto}`}
+                    label="Escuchar versículo"
+                    className="text-base"
+                  />
+                </div>
+              </div>
+            </article>
+          ))}
+        </section>
+
+        <!-- Navegación inferior -->
+        <nav class="flex justify-between items-center gap-4 py-8 border-t-2 border-gray-200" aria-label="Navegación entre capítulos">
+          {capituloAnterior ? (
+            <a
+              href={`/libro/${encodeURIComponent(nombre || '')}/${capituloAnterior}`}
+              class="btn-large inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors shadow-lg"
+            >
+              <span class="text-2xl" aria-hidden="true">⬅️</span>
+              <span class="hidden sm:inline">Capítulo {capituloAnterior}</span>
+              <span class="sm:hidden">Anterior</span>
+            </a>
+          ) : (
+            <div></div>
+          )}
+
+          {capituloSiguiente ? (
+            <a
+              href={`/libro/${encodeURIComponent(nombre || '')}/${capituloSiguiente}`}
+              class="btn-large inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors shadow-lg"
+            >
+              <span class="hidden sm:inline">Capítulo {capituloSiguiente}</span>
+              <span class="sm:hidden">Siguiente</span>
+              <span class="text-2xl" aria-hidden="true">➡️</span>
+            </a>
+          ) : (
+            <div></div>
+          )}
+        </nav>
+      </div>
+    )}
+  </div>
+</Layout>
+
+<style>
+  /* Animación suave para los versículos */
+  @media (prefers-reduced-motion: no-preference) {
+    article {
+      animation: slideUp 0.4s ease-out;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Scroll suave */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+</style>
