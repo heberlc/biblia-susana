@@ -3,19 +3,25 @@
 /* Skip link para accesibilidad */
 .skip-link {
   position: absolute;
-  top: -40px;
-  left: 0;
-  background: #000;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e40af;
   color: #fff;
-  padding: 8px 16px;
+  padding: 16px 32px;
   text-decoration: none;
-  z-index: 100;
-  border-radius: 0 0 4px 0;
+  z-index: 9999;
+  border-radius: 8px;
   font-weight: bold;
+  font-size: 1.25rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: top 0.3s ease;
 }
 
 .skip-link:focus {
-  top: 0;
+  top: 20px;
+  outline: 4px solid #fbbf24;
+  outline-offset: 4px;
 }
 
 /* Focus visible fuerte para accesibilidad */
