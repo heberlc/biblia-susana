@@ -1,0 +1,242 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout 
+  title="Buscar - Biblia Accesible"
+  description="Busca versículos en toda la Biblia"
+>
+  <div class="max-w-5xl mx-auto">
+    <!-- Formulario de búsqueda -->
+    <section class="mb-8">
+      <form id="searchForm" class="mb-6">
+        <div class="flex flex-col md:flex-row gap-4">
+          <label for="searchInput" class="sr-only">Buscar en la Biblia</label>
+          <input
+            type="search"
+            id="searchInput"
+            name="q"
+            placeholder="Buscar versículos... (ej: amor, fe, esperanza)"
+            class="flex-1 px-6 py-4 text-xl border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-300 transition-colors"
+            required
+            autofocus
+          />
+          <button
+            type="submit"
+            class="btn-large bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors shadow-lg px-8"
+          >
+            <span class="text-2xl mr-2" aria-hidden="true">🔍</span>
+            Buscar
+          </button>
+        </div>
+      </form>
+
+      <div class="flex justify-center gap-4">
+        <a
+          href="/"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 transition-colors font-semibold text-lg"
+        >
+          <span class="text-xl" aria-hidden="true">🏠</span>
+          Volver al Inicio
+        </a>
+      </div>
+    </section>
+
+    <!-- Estado de carga -->
+    <div id="loading" class="hidden text-center py-12">
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <p class="mt-4 text-xl text-gray-600 dark:text-gray-400">Buscando...</p>
+    </div>
+
+    <!-- Resultados -->
+    <div id="results" class="hidden">
+      <h2 id="resultsTitle" class="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100"></h2>
+      <div id="resultsList" class="space-y-6"></div>
+    </div>
+
+    <!-- Sin resultados -->
+    <div id="noResults" class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg">
+      <p class="font-bold text-xl mb-2">Sin resultados</p>
+      <p class="text-lg">
+        Intenta con otros términos de búsqueda o verifica la ortografía.
+      </p>
+    </div>
+
+    <!-- Mensaje inicial -->
+    <div id="initialMessage" class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-6 rounded-lg text-center">
+      <p class="font-bold text-xl mb-2">Búsqueda en la Biblia</p>
+      <p class="text-lg">
+        Ingresa un término para buscar en todos los versículos de la Biblia.
+      </p>
+      <p class="text-sm mt-4 text-blue-600">
+        Ejemplos: amor, fe, esperanza, paz, jesús
+      </p>
+    </div>
+  </div>
+
+  <script>
+    import Fuse from 'fuse.js';
+    
+    let fuseInstance = null;
+    let bibliaData = null;
+
+    // Cargar la Biblia
+    async function loadBible() {
+      const response = await fetch('/data/biblia-estructurada.json');
+      return await response.json();
+    }
+
+    // Inicializar búsqueda
+    function initializeSearch(biblia) {
+      const versiculos = [];
+      
+      biblia.libros.forEach(libro => {
+        libro.capitulos.forEach(capitulo => {
+          capitulo.versiculos.forEach(versiculo => {
+            versiculos.push({
+              libro: libro.nombre,
+              capitulo: capitulo.numero,
+              versiculo: versiculo.numero,
+              texto: versiculo.texto,
+            });
+          });
+        });
+      });
+
+      const options = {
+        keys: ['texto'],
+        threshold: 0.4,
+        includeScore: true,
+        minMatchCharLength: 3,
+        ignoreLocation: true,
+      };
+
+      fuseInstance = new Fuse(versiculos, options);
+    }
+
+    // Buscar
+    function buscar(query) {
+      if (!fuseInstance || !query || query.trim().length < 2) {
+        return [];
+      }
+
+      const resultados = fuseInstance.search(query);
+      return resultados.map(r => r.item);
+    }
+
+    // Mostrar resultados
+    function displayResults(query, resultados) {
+      const loading = document.getElementById('loading');
+      const results = document.getElementById('results');
+      const noResults = document.getElementById('noResults');
+      const initialMessage = document.getElementById('initialMessage');
+      const resultsTitle = document.getElementById('resultsTitle');
+      const resultsList = document.getElementById('resultsList');
+
+      loading.classList.add('hidden');
+      initialMessage.classList.add('hidden');
+
+      if (resultados.length === 0) {
+        results.classList.add('hidden');
+        noResults.classList.remove('hidden');
+        return;
+      }
+
+      noResults.classList.add('hidden');
+      results.classList.remove('hidden');
+      
+      resultsTitle.textContent = `${resultados.length} resultado${resultados.length !== 1 ? 's' : ''} para "${query}"`;
+      
+      resultsList.innerHTML = resultados.map(resultado => `
+        <article class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border-l-4 border-blue-500 dark:border-blue-400">
+          <header class="mb-4">
+            <h3 class="text-xl font-bold text-blue-700 dark:text-blue-400">
+              <a 
+                href="/libro/${encodeURIComponent(resultado.libro)}/${resultado.capitulo}"
+                class="hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+              >
+                ${resultado.libro} ${resultado.capitulo}:${resultado.versiculo}
+              </a>
+            </h3>
+          </header>
+          
+          <p class="text-lg text-gray-800 dark:text-gray-200 mb-4 leading-relaxed">
+            ${resultado.texto}
+          </p>
+
+          <div class="flex gap-4">
+            <a
+              href="/libro/${encodeURIComponent(resultado.libro)}/${resultado.capitulo}"
+              class="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 focus:ring-4 focus:ring-blue-300 transition-colors font-semibold"
+            >
+              Ver capítulo completo
+            </a>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    // Manejar formulario
+    document.getElementById('searchForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const query = document.getElementById('searchInput').value.trim();
+      if (!query) return;
+
+      const loading = document.getElementById('loading');
+      const results = document.getElementById('results');
+      const noResults = document.getElementById('noResults');
+      const initialMessage = document.getElementById('initialMessage');
+
+      loading.classList.remove('hidden');
+      results.classList.add('hidden');
+      noResults.classList.add('hidden');
+      initialMessage.classList.add('hidden');
+
+      try {
+        if (!bibliaData) {
+          bibliaData = await loadBible();
+          initializeSearch(bibliaData);
+        }
+
+        const resultados = buscar(query);
+        displayResults(query, resultados);
+      } catch (error) {
+        console.error('Error en búsqueda:', error);
+        loading.classList.add('hidden');
+        alert('Error al buscar. Por favor intenta de nuevo.');
+      }
+    });
+
+    // Verificar si hay query en URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const queryParam = urlParams.get('q');
+    if (queryParam) {
+      document.getElementById('searchInput').value = queryParam;
+      document.getElementById('searchForm').dispatchEvent(new Event('submit'));
+    }
+  </script>
+</Layout>
+
+<style>
+  article {
+    animation: slideIn 0.3s ease-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    article {
+      animation: none;
+    }
+  }
+</style>

@@ -40,7 +40,7 @@ const { className = "" } = Astro.props;
             
             // Redirigir a la página de búsqueda
             setTimeout(() => {
-              window.location.href = `/buscar?q=${encodeURIComponent(text)}`;
+              window.location.href = `/buscar-client?q=${encodeURIComponent(text)}`;
             }, 1000);
           },
           (error) => {

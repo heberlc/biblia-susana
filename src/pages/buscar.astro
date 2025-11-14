@@ -5,21 +5,48 @@ import { loadBible } from "../lib/loadBible";
 import { initializeSearch, buscar } from "../lib/search";
 import type { ResultadoBusqueda } from "../types/bible";
 
-// Obtener el parámetro de búsqueda
-const query = Astro.url.searchParams.get('q') || '';
+// Obtener el parámetro de búsqueda - probando múltiples formas
+const query1 = Astro.url.searchParams.get('q') || '';
+const query2 = new URL(Astro.request.url).searchParams.get('q') || '';
+const query3 = Astro.params.q || '';
+
+console.log('=== BÚSQUEDA INICIADA ===');
+console.log('Astro.url:', Astro.url.href);
+console.log('Astro.request.url:', Astro.request.url);
+console.log('Astro.url.searchParams:', Array.from(Astro.url.searchParams.entries()));
+console.log('Query método 1 (Astro.url):', query1);
+console.log('Query método 2 (new URL):', query2);
+console.log('Query método 3 (Astro.params):', query3);
+
+const query = query1 || query2 || query3;
 
 let resultados: ResultadoBusqueda[] = [];
 let error = false;
+let errorMessage = '';
 
 if (query.trim()) {
   try {
+    console.log('Cargando Biblia...');
     const biblia = await loadBible();
+    console.log('Biblia cargada, libros:', biblia.libros.length);
+    console.log('Primer libro:', biblia.libros[0]?.nombre);
+    console.log('Estructura del primer libro:', JSON.stringify(biblia.libros[0], null, 2).substring(0, 500));
+    
     initializeSearch(biblia);
+    console.log('Búsqueda inicializada');
+    
     resultados = buscar(query);
+    console.log('Resultados encontrados:', resultados.length);
+    if (resultados.length > 0) {
+      console.log('Primer resultado:', JSON.stringify(resultados[0], null, 2));
+    }
   } catch (e) {
     console.error('Error en la búsqueda:', e);
+    errorMessage = e instanceof Error ? e.message : String(e);
     error = true;
   }
+} else {
+  console.log('Query vacía, no se ejecuta búsqueda');
 }
 ---
 
@@ -68,7 +95,10 @@ if (query.trim()) {
     {error && (
       <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-6 rounded-lg" role="alert">
         <p class="font-bold text-xl mb-2">Error en la búsqueda</p>
-        <p class="text-lg">No se pudo realizar la búsqueda. Intenta de nuevo.</p>
+        <p class="text-lg mb-2">No se pudo realizar la búsqueda. Intenta de nuevo.</p>
+        {errorMessage && (
+          <p class="text-sm font-mono bg-red-200 p-2 rounded mt-2">{errorMessage}</p>
+        )}
       </div>
     )}
 
