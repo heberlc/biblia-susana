@@ -7,14 +7,15 @@ interface Props {
 }
 
 const { text, label = "Leer", className = "" } = Astro.props;
-const escapedText = text.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, ' ');
+const uniqueId = `speech-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 ---
 
-<div class="inline-flex gap-2">
+<div class="flex flex-col gap-2">
   <button
     type="button"
-    class={`btn-speech inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 transition-colors font-semibold text-lg ${className}`}
+    class="btn-speech inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 transition-colors font-semibold text-lg"
     data-text={text}
+    data-speech-id={uniqueId}
     aria-label={`${label}: ${text.substring(0, 50)}...`}
   >
     <span class="text-2xl" aria-hidden="true">🔊</span>
@@ -24,6 +25,7 @@ const escapedText = text.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g
   <button
     type="button"
     class="btn-stop-speech hidden items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-colors font-semibold text-lg"
+    data-speech-id={uniqueId}
     aria-label="Detener audio"
   >
     <span class="text-2xl" aria-hidden="true">⏹️</span>
@@ -37,13 +39,16 @@ const escapedText = text.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g
   // Inicializar Web Speech API
   initSpeech();
 
+  let currentActiveSpeechId: string | null = null;
+
   // Función para actualizar el estado de los botones
-  function updateButtons() {
+  function updateButtons(activeSpeechId: string | null) {
     const speaking = isSpeaking();
-    const stopButtons = document.querySelectorAll('.btn-stop-speech');
+    const allStopButtons = document.querySelectorAll('.btn-stop-speech');
     
-    stopButtons.forEach(btn => {
-      if (speaking) {
+    allStopButtons.forEach(btn => {
+      const btnId = btn.getAttribute('data-speech-id');
+      if (speaking && btnId === activeSpeechId) {
         btn.classList.remove('hidden');
         btn.classList.add('inline-flex');
       } else {
@@ -62,20 +67,24 @@ const escapedText = text.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g
       button.addEventListener('click', (e) => {
         const target = e.currentTarget as HTMLButtonElement;
         const text = target.dataset.text || target.getAttribute('data-text');
+        const speechId = target.getAttribute('data-speech-id');
         
-        if (text) {
+        if (text && speechId) {
           speechStop();
+          currentActiveSpeechId = speechId;
           speechRead(text);
           
           // Esperar un momento para que comience a hablar
           setTimeout(() => {
-            updateButtons();
+            updateButtons(currentActiveSpeechId);
           }, 100);
           
           // Actualizar botones periódicamente mientras habla
           const interval = setInterval(() => {
-            updateButtons();
+            updateButtons(currentActiveSpeechId);
             if (!isSpeaking()) {
+              currentActiveSpeechId = null;
+              updateButtons(null);
               clearInterval(interval);
             }
           }, 500);
@@ -86,7 +95,8 @@ const escapedText = text.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g
     stopButtons.forEach(button => {
       button.addEventListener('click', () => {
         speechStop();
-        updateButtons();
+        currentActiveSpeechId = null;
+        updateButtons(null);
       });
     });
   });
