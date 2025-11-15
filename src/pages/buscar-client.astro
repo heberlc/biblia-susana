@@ -158,7 +158,7 @@ import Layout from "../layouts/Layout.astro";
           <header class="mb-4">
             <h3 class="text-xl font-bold text-blue-700 dark:text-blue-400">
               <a 
-                href="/libro/${encodeURIComponent(resultado.libro)}/${resultado.capitulo}"
+                href="/libro/${encodeURIComponent(resultado.libro)}/${resultado.capitulo}#v${resultado.versiculo}"
                 class="hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
               >
                 ${resultado.libro} ${resultado.capitulo}:${resultado.versiculo}
@@ -174,7 +174,9 @@ import Layout from "../layouts/Layout.astro";
             <a
               href="/libro/${encodeURIComponent(resultado.libro)}/${resultado.capitulo}"
               class="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 focus:ring-4 focus:ring-blue-300 transition-colors font-semibold"
+              aria-label="Ver capítulo ${resultado.capitulo} completo de ${resultado.libro}"
             >
+              <span class="text-xl" aria-hidden="true">📖</span>
               Ver capítulo completo
             </a>
           </div>

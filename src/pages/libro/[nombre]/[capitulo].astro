@@ -197,4 +197,40 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
       scroll-behavior: auto;
     }
   }
+
+  /* Resaltar versículo objetivo */
+  .verse-highlight {
+    animation: highlight 2s ease-in-out;
+  }
+
+  @keyframes highlight {
+    0%, 100% {
+      background-color: transparent;
+    }
+    50% {
+      background-color: rgba(59, 130, 246, 0.2);
+    }
+  }
 </style>
+
+<script>
+  // Hacer scroll al versículo si hay hash en la URL
+  if (window.location.hash) {
+    const hash = window.location.hash;
+    const element = document.querySelector(hash);
+    
+    if (element) {
+      // Esperar a que todo cargue
+      setTimeout(() => {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Agregar animación de resaltado
+        element.classList.add('verse-highlight');
+        
+        // Remover la clase después de la animación
+        setTimeout(() => {
+          element.classList.remove('verse-highlight');
+        }, 2000);
+      }, 100);
+    }
+  }
+</script>
