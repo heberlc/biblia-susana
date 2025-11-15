@@ -69,10 +69,14 @@ const textEscaped = JSON.stringify(text);
       if (!playBtn) return;
       
       let monitoringInterval = null;
+      let chunks = [];
+      let currentChunkIndex = 0;
+      let isPlayingChunks = false;
+      let manualPausedState = false;
       
       function updateButtons() {
         const speaking = window.speechSynthesis && window.speechSynthesis.speaking;
-        const paused = window.speechSynthesis && window.speechSynthesis.paused;
+        const paused = manualPausedState || (window.speechSynthesis && window.speechSynthesis.paused);
         
         if (speaking && !paused) {
           playBtn.classList.add('hidden');
@@ -105,11 +109,48 @@ const textEscaped = JSON.stringify(text);
         if (monitoringInterval) clearInterval(monitoringInterval);
         monitoringInterval = setInterval(function() {
           updateButtons();
-          if (!window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+          if (!window.speechSynthesis.speaking && !manualPausedState) {
             clearInterval(monitoringInterval);
             monitoringInterval = null;
           }
-        }, 300);
+        }, 200);
+      }
+      
+      function speakNextChunk() {
+        if (!isPlayingChunks || currentChunkIndex >= chunks.length) {
+          if (currentChunkIndex >= chunks.length) {
+            console.log('All chunks completed');
+            isPlayingChunks = false;
+            chunks = [];
+            currentChunkIndex = 0;
+          }
+          setTimeout(function() { updateButtons(); }, 500);
+          return;
+        }
+        
+        const utterance = new SpeechSynthesisUtterance(chunks[currentChunkIndex]);
+        utterance.lang = 'es-ES';
+        utterance.rate = 0.9;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        
+        utterance.onstart = function() {
+          console.log('Chunk', currentChunkIndex + 1, 'of', chunks.length, 'started');
+        };
+        
+        utterance.onend = function() {
+          console.log('Chunk', currentChunkIndex + 1, 'ended');
+          currentChunkIndex++;
+          speakNextChunk();
+        };
+        
+        utterance.onerror = function(event) {
+          console.error('Speech error on chunk', currentChunkIndex + 1, ':', event.error);
+          currentChunkIndex++;
+          speakNextChunk();
+        };
+        
+        window.speechSynthesis.speak(utterance);
       }
       
       playBtn.addEventListener('click', function() {
@@ -121,11 +162,14 @@ const textEscaped = JSON.stringify(text);
         }
         
         window.speechSynthesis.cancel();
+        chunks = [];
+        currentChunkIndex = 0;
+        isPlayingChunks = false;
+        manualPausedState = false;
         
         // Si el texto es muy largo (>4000 caracteres), dividirlo
         if (chapterText.length > 4000) {
           console.log('Text too long, splitting into chunks');
-          const chunks = [];
           const sentences = chapterText.split(/(?<=[.!?])\s+/);
           let currentChunk = '';
           
@@ -141,41 +185,10 @@ const textEscaped = JSON.stringify(text);
           
           console.log('Total chunks:', chunks.length);
           
-          let currentIndex = 0;
-          
-          function speakNextChunk() {
-            if (currentIndex >= chunks.length) {
-              console.log('All chunks completed');
-              setTimeout(function() { updateButtons(); }, 500);
-              return;
-            }
-            
-            const utterance = new SpeechSynthesisUtterance(chunks[currentIndex]);
-            utterance.lang = 'es-ES';
-            utterance.rate = 0.9;
-            utterance.pitch = 1.0;
-            utterance.volume = 1.0;
-            
-            utterance.onstart = function() {
-              console.log('Chunk', currentIndex + 1, 'of', chunks.length, 'started');
-            };
-            
-            utterance.onend = function() {
-              console.log('Chunk', currentIndex + 1, 'ended');
-              currentIndex++;
-              speakNextChunk();
-            };
-            
-            utterance.onerror = function(event) {
-              console.error('Speech error on chunk', currentIndex + 1, ':', event.error);
-              currentIndex++;
-              speakNextChunk();
-            };
-            
-            window.speechSynthesis.speak(utterance);
-          }
-          
+          isPlayingChunks = true;
+          currentChunkIndex = 0;
           speakNextChunk();
+          
           setTimeout(function() {
             updateButtons();
             startMonitoring();
@@ -211,23 +224,34 @@ const textEscaped = JSON.stringify(text);
       });
       
       pauseBtn.addEventListener('click', function() {
-        if (window.speechSynthesis && window.speechSynthesis.speaking) {
+        console.log('Pause clicked');
+        if (window.speechSynthesis && window.speechSynthesis.speaking && !manualPausedState) {
           window.speechSynthesis.pause();
+          manualPausedState = true;
+          console.log('Paused, manual state set to true');
           updateButtons();
         }
       });
       
       resumeBtn.addEventListener('click', function() {
-        if (window.speechSynthesis && window.speechSynthesis.paused) {
+        console.log('Resume clicked');
+        if (window.speechSynthesis && manualPausedState) {
           window.speechSynthesis.resume();
+          manualPausedState = false;
+          console.log('Resumed, manual state set to false');
           updateButtons();
           startMonitoring();
         }
       });
       
       stopBtn.addEventListener('click', function() {
+        console.log('Stop clicked');
         if (window.speechSynthesis) {
           window.speechSynthesis.cancel();
+          isPlayingChunks = false;
+          chunks = [];
+          currentChunkIndex = 0;
+          manualPausedState = false;
           updateButtons();
           if (monitoringInterval) {
             clearInterval(monitoringInterval);
