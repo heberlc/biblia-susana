@@ -72,24 +72,107 @@ try {
     <!-- Lista de libros -->
     {!error && libros.length > 0 && (
       <section>
-        <h3 class="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">
+        <h3 class="text-3xl font-bold mb-8 text-gray-800 dark:text-gray-100 text-center">
           Libros de la Biblia
         </h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {libros.map((libro) => (
-            <LibroCard
-              nombre={libro.nombre}
-              numCapitulos={libro.capitulos.length}
-              href={`/libro/${encodeURIComponent(libro.nombre)}`}
-            />
-          ))}
+        
+        <!-- Pestañas -->
+        <div class="mb-8">
+          <div class="flex justify-center gap-4 flex-wrap">
+            <button
+              id="tabAT"
+              class="tab-button active px-8 py-3 text-lg font-bold rounded-lg transition-colors"
+            >
+              📜 Antiguo Testamento
+            </button>
+            <button
+              id="tabNT"
+              class="tab-button px-8 py-3 text-lg font-bold rounded-lg transition-colors"
+            >
+              ✝️ Nuevo Testamento
+            </button>
+          </div>
+        </div>
+
+        <!-- Antiguo Testamento -->
+        <div id="contentAT" class="tab-content">
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {libros.slice(0, 39).map((libro) => (
+              <LibroCard
+                nombre={libro.nombre}
+                numCapitulos={libro.capitulos.length}
+                href={`/libro/${encodeURIComponent(libro.nombre)}`}
+              />
+            ))}
+          </div>
+        </div>
+
+        <!-- Nuevo Testamento -->
+        <div id="contentNT" class="tab-content hidden">
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {libros.slice(39).map((libro) => (
+              <LibroCard
+                nombre={libro.nombre}
+                numCapitulos={libro.capitulos.length}
+                href={`/libro/${encodeURIComponent(libro.nombre)}`}
+              />
+            ))}
+          </div>
         </div>
       </section>
     )}
   </div>
+
+  <script>
+    const tabAT = document.getElementById('tabAT');
+    const tabNT = document.getElementById('tabNT');
+    const contentAT = document.getElementById('contentAT');
+    const contentNT = document.getElementById('contentNT');
+
+    function switchTab(showAT) {
+      if (showAT) {
+        tabAT?.classList.add('active');
+        tabNT?.classList.remove('active');
+        contentAT?.classList.remove('hidden');
+        contentNT?.classList.add('hidden');
+      } else {
+        tabAT?.classList.remove('active');
+        tabNT?.classList.add('active');
+        contentAT?.classList.add('hidden');
+        contentNT?.classList.remove('hidden');
+      }
+    }
+
+    tabAT?.addEventListener('click', () => switchTab(true));
+    tabNT?.addEventListener('click', () => switchTab(false));
+  </script>
 </Layout>
 
 <style>
+  .tab-button {
+    background: #e5e7eb;
+    color: #374151;
+  }
+
+  .dark .tab-button {
+    background: #374151;
+    color: #e5e7eb;
+  }
+
+  .tab-button.active {
+    background: #2563eb;
+    color: white;
+  }
+
+  .dark .tab-button.active {
+    background: #1e40af;
+    color: white;
+  }
+
+  .tab-button:hover {
+    opacity: 0.9;
+  }
+
   /* Animación suave para las tarjetas (respeta prefers-reduced-motion) */
   @media (prefers-reduced-motion: no-preference) {
     .grid > * {

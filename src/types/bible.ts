@@ -2,6 +2,7 @@
 
 export interface Versiculo {
   numero: number;
+  titulo?: string;
   texto: string;
 }
 

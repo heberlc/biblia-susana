@@ -111,6 +111,11 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
               id={`v${versiculo.numero}`}
               class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border-l-4 border-blue-500 dark:border-blue-400"
             >
+              {versiculo.titulo && (
+                <h3 class="text-2xl font-bold text-blue-700 dark:text-blue-400 mb-4 border-b-2 border-blue-200 dark:border-blue-700 pb-2">
+                  {versiculo.titulo}
+                </h3>
+              )}
               <div class="flex items-start gap-4">
                 <span class="shrink-0 w-12 h-12 bg-blue-600 dark:bg-blue-700 text-white rounded-full flex items-center justify-center text-xl font-bold" aria-label={`Versículo ${versiculo.numero}`}>
                   {versiculo.numero}
@@ -120,7 +125,7 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
                     {versiculo.texto}
                   </p>
                   <SpeechButton 
-                    text={`${libro.nombre} ${capituloNum} ${versiculo.numero}. ${versiculo.texto}`}
+                    text={`${versiculo.titulo ? versiculo.titulo + '. ' : ''}${libro.nombre} ${capituloNum} ${versiculo.numero}. ${versiculo.texto}`}
                     label="Escuchar versículo"
                     className="text-base"
                   />

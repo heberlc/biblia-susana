@@ -7,13 +7,17 @@ interface Props {
 }
 
 const { text, label = "Leer capítulo completo", className = "" } = Astro.props;
+// Generar ID único para esta instancia
+const uniqueId = `chapter-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+// Escapar el texto para JSON
+const textEscaped = JSON.stringify(text);
 ---
 
-<div class="inline-flex gap-3 flex-wrap">
+<div class="inline-flex gap-3 flex-wrap" id={`controls-${uniqueId}`}>
   <button
     type="button"
     class="btn-play-chapter inline-flex items-center gap-2 px-8 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 transition-colors font-semibold text-xl shadow-lg"
-    data-text={text}
+    id={`play-${uniqueId}`}
     aria-label={label}
   >
     <span class="text-3xl" aria-hidden="true">▶️</span>
@@ -23,6 +27,7 @@ const { text, label = "Leer capítulo completo", className = "" } = Astro.props;
   <button
     type="button"
     class="btn-pause-chapter hidden items-center gap-2 px-8 py-4 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 focus:ring-4 focus:ring-yellow-300 transition-colors font-semibold text-xl shadow-lg"
+    id={`pause-${uniqueId}`}
     aria-label="Pausar"
   >
     <span class="text-3xl" aria-hidden="true">⏸️</span>
@@ -32,6 +37,7 @@ const { text, label = "Leer capítulo completo", className = "" } = Astro.props;
   <button
     type="button"
     class="btn-resume-chapter hidden items-center gap-2 px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors font-semibold text-xl shadow-lg"
+    id={`resume-${uniqueId}`}
     aria-label="Continuar"
   >
     <span class="text-3xl" aria-hidden="true">▶️</span>
@@ -41,6 +47,7 @@ const { text, label = "Leer capítulo completo", className = "" } = Astro.props;
   <button
     type="button"
     class="btn-stop-chapter hidden items-center gap-2 px-8 py-4 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-colors font-semibold text-xl shadow-lg"
+    id={`stop-${uniqueId}`}
     aria-label="Detener"
   >
     <span class="text-3xl" aria-hidden="true">⏹️</span>
@@ -48,115 +55,192 @@ const { text, label = "Leer capítulo completo", className = "" } = Astro.props;
   </button>
 </div>
 
-<script>
-  import { speechRead, speechStop, speechPause, speechResume, isSpeaking, isPaused, initSpeech } from '../lib/speech';
-
-  // Inicializar Web Speech API
-  initSpeech();
-
-  // Estado de los controles
-  let updateInterval: number | null = null;
-
-  // Función para actualizar el estado de los botones
-  function updateChapterButtons() {
-    const speaking = isSpeaking();
-    const paused = isPaused();
+<script is:inline data-astro-rerun define:vars={{ uniqueId, textEscaped }}>
+  (function() {
+    const controlsId = uniqueId;
+    const chapterText = JSON.parse(textEscaped);
     
-    const playBtn = document.querySelector('.btn-play-chapter');
-    const pauseBtn = document.querySelector('.btn-pause-chapter');
-    const resumeBtn = document.querySelector('.btn-resume-chapter');
-    const stopBtn = document.querySelector('.btn-stop-chapter');
-
-    if (speaking && !paused) {
-      // Está hablando: mostrar pause y stop
-      playBtn?.classList.add('hidden');
-      pauseBtn?.classList.remove('hidden');
-      pauseBtn?.classList.add('inline-flex');
-      resumeBtn?.classList.add('hidden');
-      resumeBtn?.classList.remove('inline-flex');
-      stopBtn?.classList.remove('hidden');
-      stopBtn?.classList.add('inline-flex');
-    } else if (paused) {
-      // Está pausado: mostrar resume y stop
-      playBtn?.classList.add('hidden');
-      pauseBtn?.classList.add('hidden');
-      pauseBtn?.classList.remove('inline-flex');
-      resumeBtn?.classList.remove('hidden');
-      resumeBtn?.classList.add('inline-flex');
-      stopBtn?.classList.remove('hidden');
-      stopBtn?.classList.add('inline-flex');
-    } else {
-      // No está hablando: mostrar solo play
-      playBtn?.classList.remove('hidden');
-      pauseBtn?.classList.add('hidden');
-      pauseBtn?.classList.remove('inline-flex');
-      resumeBtn?.classList.add('hidden');
-      resumeBtn?.classList.remove('inline-flex');
-      stopBtn?.classList.add('hidden');
-      stopBtn?.classList.remove('inline-flex');
-    }
-  }
-
-  // Función para iniciar el monitoreo
-  function startMonitoring() {
-    if (updateInterval) {
-      clearInterval(updateInterval);
-    }
-    updateInterval = window.setInterval(() => {
-      updateChapterButtons();
-      if (!isSpeaking() && !isPaused()) {
-        if (updateInterval) {
-          clearInterval(updateInterval);
-          updateInterval = null;
+    function initControls() {
+      const playBtn = document.getElementById('play-' + controlsId);
+      const pauseBtn = document.getElementById('pause-' + controlsId);
+      const resumeBtn = document.getElementById('resume-' + controlsId);
+      const stopBtn = document.getElementById('stop-' + controlsId);
+      
+      if (!playBtn) return;
+      
+      let monitoringInterval = null;
+      
+      function updateButtons() {
+        const speaking = window.speechSynthesis && window.speechSynthesis.speaking;
+        const paused = window.speechSynthesis && window.speechSynthesis.paused;
+        
+        if (speaking && !paused) {
+          playBtn.classList.add('hidden');
+          pauseBtn.classList.remove('hidden');
+          pauseBtn.classList.add('inline-flex');
+          resumeBtn.classList.add('hidden');
+          resumeBtn.classList.remove('inline-flex');
+          stopBtn.classList.remove('hidden');
+          stopBtn.classList.add('inline-flex');
+        } else if (paused) {
+          playBtn.classList.add('hidden');
+          pauseBtn.classList.add('hidden');
+          pauseBtn.classList.remove('inline-flex');
+          resumeBtn.classList.remove('hidden');
+          resumeBtn.classList.add('inline-flex');
+          stopBtn.classList.remove('hidden');
+          stopBtn.classList.add('inline-flex');
+        } else {
+          playBtn.classList.remove('hidden');
+          pauseBtn.classList.add('hidden');
+          pauseBtn.classList.remove('inline-flex');
+          resumeBtn.classList.add('hidden');
+          resumeBtn.classList.remove('inline-flex');
+          stopBtn.classList.add('hidden');
+          stopBtn.classList.remove('inline-flex');
         }
       }
-    }, 300);
-  }
-
-  // Agregar listeners
-  document.addEventListener('DOMContentLoaded', () => {
-    const playBtn = document.querySelector('.btn-play-chapter');
-    const pauseBtn = document.querySelector('.btn-pause-chapter');
-    const resumeBtn = document.querySelector('.btn-resume-chapter');
-    const stopBtn = document.querySelector('.btn-stop-chapter');
-
-    // Play
-    playBtn?.addEventListener('click', (e) => {
-      const target = e.currentTarget as HTMLButtonElement;
-      const text = target.dataset.text || target.getAttribute('data-text');
       
-      if (text) {
-        speechStop();
-        speechRead(text);
+      function startMonitoring() {
+        if (monitoringInterval) clearInterval(monitoringInterval);
+        monitoringInterval = setInterval(function() {
+          updateButtons();
+          if (!window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+            clearInterval(monitoringInterval);
+            monitoringInterval = null;
+          }
+        }, 300);
+      }
+      
+      playBtn.addEventListener('click', function() {
+        console.log('Play clicked, text length:', chapterText.length);
         
-        setTimeout(() => {
-          updateChapterButtons();
+        if (!chapterText || !window.speechSynthesis) {
+          console.error('No text or speechSynthesis not available');
+          return;
+        }
+        
+        window.speechSynthesis.cancel();
+        
+        // Si el texto es muy largo (>4000 caracteres), dividirlo
+        if (chapterText.length > 4000) {
+          console.log('Text too long, splitting into chunks');
+          const chunks = [];
+          const sentences = chapterText.split(/(?<=[.!?])\s+/);
+          let currentChunk = '';
+          
+          for (let i = 0; i < sentences.length; i++) {
+            if (currentChunk.length + sentences[i].length < 3500) {
+              currentChunk += (currentChunk ? ' ' : '') + sentences[i];
+            } else {
+              if (currentChunk) chunks.push(currentChunk);
+              currentChunk = sentences[i];
+            }
+          }
+          if (currentChunk) chunks.push(currentChunk);
+          
+          console.log('Total chunks:', chunks.length);
+          
+          let currentIndex = 0;
+          
+          function speakNextChunk() {
+            if (currentIndex >= chunks.length) {
+              console.log('All chunks completed');
+              setTimeout(function() { updateButtons(); }, 500);
+              return;
+            }
+            
+            const utterance = new SpeechSynthesisUtterance(chunks[currentIndex]);
+            utterance.lang = 'es-ES';
+            utterance.rate = 0.9;
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+            
+            utterance.onstart = function() {
+              console.log('Chunk', currentIndex + 1, 'of', chunks.length, 'started');
+            };
+            
+            utterance.onend = function() {
+              console.log('Chunk', currentIndex + 1, 'ended');
+              currentIndex++;
+              speakNextChunk();
+            };
+            
+            utterance.onerror = function(event) {
+              console.error('Speech error on chunk', currentIndex + 1, ':', event.error);
+              currentIndex++;
+              speakNextChunk();
+            };
+            
+            window.speechSynthesis.speak(utterance);
+          }
+          
+          speakNextChunk();
+          setTimeout(function() {
+            updateButtons();
+            startMonitoring();
+          }, 100);
+          
+        } else {
+          // Texto corto, leer completo
+          const utterance = new SpeechSynthesisUtterance(chapterText);
+          utterance.lang = 'es-ES';
+          utterance.rate = 0.9;
+          utterance.pitch = 1.0;
+          utterance.volume = 1.0;
+          
+          utterance.onstart = function() {
+            console.log('Speech started');
+          };
+          
+          utterance.onerror = function(event) {
+            console.error('Speech error:', event.error);
+          };
+          
+          utterance.onend = function() {
+            console.log('Speech ended');
+          };
+          
+          window.speechSynthesis.speak(utterance);
+          
+          setTimeout(function() {
+            updateButtons();
+            startMonitoring();
+          }, 100);
+        }
+      });
+      
+      pauseBtn.addEventListener('click', function() {
+        if (window.speechSynthesis && window.speechSynthesis.speaking) {
+          window.speechSynthesis.pause();
+          updateButtons();
+        }
+      });
+      
+      resumeBtn.addEventListener('click', function() {
+        if (window.speechSynthesis && window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+          updateButtons();
           startMonitoring();
-        }, 100);
-      }
-    });
-
-    // Pause
-    pauseBtn?.addEventListener('click', () => {
-      speechPause();
-      updateChapterButtons();
-    });
-
-    // Resume
-    resumeBtn?.addEventListener('click', () => {
-      speechResume();
-      updateChapterButtons();
-      startMonitoring();
-    });
-
-    // Stop
-    stopBtn?.addEventListener('click', () => {
-      speechStop();
-      updateChapterButtons();
-      if (updateInterval) {
-        clearInterval(updateInterval);
-        updateInterval = null;
-      }
-    });
-  });
+        }
+      });
+      
+      stopBtn.addEventListener('click', function() {
+        if (window.speechSynthesis) {
+          window.speechSynthesis.cancel();
+          updateButtons();
+          if (monitoringInterval) {
+            clearInterval(monitoringInterval);
+            monitoringInterval = null;
+          }
+        }
+      });
+    }
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initControls);
+    } else {
+      initControls();
+    }
+  })();
 </script>

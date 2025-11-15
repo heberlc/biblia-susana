@@ -7,11 +7,13 @@ interface VersiculoPlano {
   libro: string;
   capitulo: number;
   versiculo: number;
+  titulo: string | null;
   texto: string;
 }
 
 interface Versiculo {
   numero: number;
+  titulo?: string;
   texto: string;
 }
 
@@ -51,10 +53,17 @@ async function transformarBiblia() {
         capitulosMap.set(v.capitulo, []);
       }
       
-      capitulosMap.get(v.capitulo)!.push({
+      const versiculo: Versiculo = {
         numero: v.versiculo,
         texto: v.texto
-      });
+      };
+      
+      // Solo agregar título si existe
+      if (v.titulo) {
+        versiculo.titulo = v.titulo;
+      }
+      
+      capitulosMap.get(v.capitulo)!.push(versiculo);
     });
     
     // Construir estructura final
@@ -85,18 +94,23 @@ async function transformarBiblia() {
     
     // Ordenar libros según el orden bíblico tradicional
     const ordenLibros = [
-      // Antiguo Testamento
+      // Antiguo Testamento (39 libros)
       'Génesis', 'Éxodo', 'Levítico', 'Números', 'Deuteronomio',
-      'Josué', 'Jueces', 'Rut', '1 Samuel', '2 Samuel', '1 Reyes', '2 Reyes',
+      'Josué', 'Jueces', 'Rut', 
+      '1 Samuel', '2 Samuel', '1 Reyes', '2 Reyes',
       '1 Crónicas', '2 Crónicas', 'Esdras', 'Nehemías', 'Ester',
       'Job', 'Salmos', 'Proverbios', 'Eclesiastés', 'Cantares',
       'Isaías', 'Jeremías', 'Lamentaciones', 'Ezequiel', 'Daniel',
-      'Oseas', 'Joel', 'Amós', 'Abdías', 'Jonás', 'Miqueas', 'Nahúm', 'Habacuc', 'Sofonías', 'Hageo', 'Zacarías', 'Malaquías',
-      // Nuevo Testamento
+      'Oseas', 'Joel', 'Amós', 'Abdías', 'Jonás', 'Miqueas', 
+      'Nahúm', 'Habacuc', 'Sofonías', 'Hageo', 'Zacarías', 'Malaquías',
+      // Nuevo Testamento (27 libros)
       'Mateo', 'Marcos', 'Lucas', 'Juan', 'Hechos',
-      'Romanos', '1 Corintios', '2 Corintios', 'Gálatas', 'Efesios', 'Filipenses', 'Colosenses',
-      '1 Tesalonicenses', '2 Tesalonicenses', '1 Timoteo', '2 Timoteo', 'Tito', 'Filemón',
-      'Hebreos', 'Santiago', '1 Pedro', '2 Pedro', '1 Juan', '2 Juan', '3 Juan', 'Judas', 'Apocalipsis'
+      'Romanos', '1 Corintios', '2 Corintios', 'Gálatas', 'Efesios', 
+      'Filipenses', 'Colosenses',
+      '1 Tesalonicenses', '2 Tesalonicenses', '1 Timoteo', '2 Timoteo', 
+      'Tito', 'Filemón',
+      'Hebreos', 'Santiago', '1 Pedro', '2 Pedro', 
+      '1 Juan', '2 Juan', '3 Juan', 'Judas', 'Apocalipsis'
     ];
     
     libros.sort((a, b) => {

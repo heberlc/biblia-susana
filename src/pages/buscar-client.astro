@@ -97,6 +97,7 @@ import Layout from "../layouts/Layout.astro";
               libro: libro.nombre,
               capitulo: capitulo.numero,
               versiculo: versiculo.numero,
+              titulo: versiculo.titulo || null,
               texto: versiculo.texto,
             });
           });
@@ -104,7 +105,7 @@ import Layout from "../layouts/Layout.astro";
       });
 
       const options = {
-        keys: ['texto'],
+        keys: ['texto', 'titulo'],
         threshold: 0.4,
         includeScore: true,
         minMatchCharLength: 3,
@@ -149,6 +150,11 @@ import Layout from "../layouts/Layout.astro";
       
       resultsList.innerHTML = resultados.map(resultado => `
         <article class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border-l-4 border-blue-500 dark:border-blue-400">
+          ${resultado.titulo ? `
+            <h3 class="text-lg font-bold text-blue-700 dark:text-blue-400 mb-2">
+              ${resultado.titulo}
+            </h3>
+          ` : ''}
           <header class="mb-4">
             <h3 class="text-xl font-bold text-blue-700 dark:text-blue-400">
               <a 
