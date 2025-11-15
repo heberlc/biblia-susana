@@ -57,6 +57,29 @@ const uniqueId = `speech-${Date.now()}-${Math.random().toString(36).substr(2, 9)
       }
     });
   }
+  
+  // Función para resetear los botones del capítulo
+  function resetChapterButtons() {
+    // Detener cualquier reproducción de capítulo
+    speechStop();
+    
+    // Buscar todos los botones de capítulo y resetear su estado
+    const chapterControls = document.querySelectorAll('[id^="controls-chapter-"]');
+    chapterControls.forEach(container => {
+      const playBtn = container.querySelector('.btn-play-chapter');
+      const pauseBtn = container.querySelector('.btn-pause-chapter');
+      const resumeBtn = container.querySelector('.btn-resume-chapter');
+      const stopBtn = container.querySelector('.btn-stop-chapter');
+      
+      playBtn?.classList.remove('hidden');
+      pauseBtn?.classList.add('hidden');
+      resumeBtn?.classList.add('hidden');
+      stopBtn?.classList.add('hidden');
+    });
+    
+    // Disparar evento personalizado para que ChapterSpeechButton se resetee
+    window.dispatchEvent(new CustomEvent('verse-speech-started'));
+  }
 
   // Agregar listeners a todos los botones de speech
   document.addEventListener('DOMContentLoaded', () => {
@@ -70,6 +93,9 @@ const uniqueId = `speech-${Date.now()}-${Math.random().toString(36).substr(2, 9)
         const speechId = target.getAttribute('data-speech-id');
         
         if (text && speechId) {
+          // Resetear controles del capítulo antes de leer el verso
+          resetChapterButtons();
+          
           speechStop();
           currentActiveSpeechId = speechId;
           speechRead(text);

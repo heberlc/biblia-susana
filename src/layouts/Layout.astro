@@ -7,8 +7,8 @@ interface Props {
 }
 
 const { 
-  title = "Biblia App - Lee la Palabra de Dios", 
-  description = "Aplicación accesible para leer y estudiar la Biblia en español" 
+  title = "Biblia Susana - Lee la Palabra de Dios", 
+  description = "Biblia Susana: Aplicación diseñada para leer y estudiar la Biblia con herramientas accesibles, lectura en voz alta y búsqueda inteligente" 
 } = Astro.props;
 ---
 
@@ -41,9 +41,9 @@ const {
     <header class="sticky top-0 z-50 bg-blue-700 dark:bg-blue-900 text-white shadow-lg transition-colors duration-300">
       <div class="container mx-auto px-4 py-6">
         <nav class="flex justify-between items-center">
-          <a href="/" class="inline-flex items-center gap-3 hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-blue-300 rounded-lg px-2 py-1">
-            <span class="text-4xl" aria-hidden="true">📖</span>
-            <h1 class="text-3xl font-bold">Biblia Accesible</h1>
+          <a href="/" class="inline-flex items-center gap-2 hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-blue-300 rounded-lg px-2 py-1">
+            <span class="text-2xl" aria-hidden="true">📖</span>
+            <h1 class="text-2xl sm:text-3xl font-bold">Biblia Susana</h1>
           </a>
           
           <!-- Botón de modo nocturno -->
@@ -65,9 +65,11 @@ const {
     </main>
 
     <footer class="bg-gray-800 dark:bg-gray-950 text-white mt-12 transition-colors duration-300">
-      <div class="container mx-auto px-4 py-6 text-center">
-        <p class="text-lg">&copy; {new Date().getFullYear()} Biblia Accesible</p>
-        <p class="text-sm text-gray-400 mt-2">Diseñado con accesibilidad para todos</p>
+      <div class="container mx-auto px-4 py-6">
+        <div class="flex flex-col items-center justify-center w-full">
+          <p class="text-lg max-w-none">&copy; {new Date().getFullYear()} Biblia Susana</p>
+          <p class="text-sm text-gray-400 mt-2 max-w-none">Creado con ❤️ por <span class="font-semibold text-blue-400">HeberDev</span></p>
+        </div>
       </div>
     </footer>
 

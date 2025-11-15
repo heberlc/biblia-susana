@@ -72,13 +72,13 @@ const textEscaped = JSON.stringify(text);
       let chunks = [];
       let currentChunkIndex = 0;
       let isPlayingChunks = false;
-      let manualPausedState = false;
+      let isPausedManually = false;
       
       function updateButtons() {
         const speaking = window.speechSynthesis && window.speechSynthesis.speaking;
-        const paused = manualPausedState || (window.speechSynthesis && window.speechSynthesis.paused);
         
-        if (speaking && !paused) {
+        if (speaking && !isPausedManually) {
+          // Está reproduciendo
           playBtn.classList.add('hidden');
           pauseBtn.classList.remove('hidden');
           pauseBtn.classList.add('inline-flex');
@@ -86,7 +86,8 @@ const textEscaped = JSON.stringify(text);
           resumeBtn.classList.remove('inline-flex');
           stopBtn.classList.remove('hidden');
           stopBtn.classList.add('inline-flex');
-        } else if (paused) {
+        } else if (isPausedManually) {
+          // Está pausado
           playBtn.classList.add('hidden');
           pauseBtn.classList.add('hidden');
           pauseBtn.classList.remove('inline-flex');
@@ -95,6 +96,7 @@ const textEscaped = JSON.stringify(text);
           stopBtn.classList.remove('hidden');
           stopBtn.classList.add('inline-flex');
         } else {
+          // Detenido
           playBtn.classList.remove('hidden');
           pauseBtn.classList.add('hidden');
           pauseBtn.classList.remove('inline-flex');
@@ -109,7 +111,7 @@ const textEscaped = JSON.stringify(text);
         if (monitoringInterval) clearInterval(monitoringInterval);
         monitoringInterval = setInterval(function() {
           updateButtons();
-          if (!window.speechSynthesis.speaking && !manualPausedState) {
+          if (!window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
             clearInterval(monitoringInterval);
             monitoringInterval = null;
           }
@@ -165,7 +167,7 @@ const textEscaped = JSON.stringify(text);
         chunks = [];
         currentChunkIndex = 0;
         isPlayingChunks = false;
-        manualPausedState = false;
+        isPausedManually = false;
         
         // Si el texto es muy largo (>4000 caracteres), dividirlo
         if (chapterText.length > 4000) {
@@ -225,20 +227,20 @@ const textEscaped = JSON.stringify(text);
       
       pauseBtn.addEventListener('click', function() {
         console.log('Pause clicked');
-        if (window.speechSynthesis && window.speechSynthesis.speaking && !manualPausedState) {
+        if (window.speechSynthesis && window.speechSynthesis.speaking && !isPausedManually) {
           window.speechSynthesis.pause();
-          manualPausedState = true;
-          console.log('Paused, manual state set to true');
+          isPausedManually = true;
+          console.log('Paused manually');
           updateButtons();
         }
       });
       
       resumeBtn.addEventListener('click', function() {
         console.log('Resume clicked');
-        if (window.speechSynthesis && manualPausedState) {
+        if (window.speechSynthesis && isPausedManually) {
           window.speechSynthesis.resume();
-          manualPausedState = false;
-          console.log('Resumed, manual state set to false');
+          isPausedManually = false;
+          console.log('Resumed');
           updateButtons();
           startMonitoring();
         }
@@ -249,9 +251,26 @@ const textEscaped = JSON.stringify(text);
         if (window.speechSynthesis) {
           window.speechSynthesis.cancel();
           isPlayingChunks = false;
+          isPausedManually = false;
           chunks = [];
           currentChunkIndex = 0;
-          manualPausedState = false;
+          updateButtons();
+          if (monitoringInterval) {
+            clearInterval(monitoringInterval);
+            monitoringInterval = null;
+          }
+        }
+      });
+      
+      // Escuchar evento personalizado desde SpeechButton para resetear cuando se lee un verso
+      window.addEventListener('verse-speech-started', function() {
+        console.log('Verse speech started, resetting chapter controls');
+        if (window.speechSynthesis) {
+          window.speechSynthesis.cancel();
+          isPlayingChunks = false;
+          isPausedManually = false;
+          chunks = [];
+          currentChunkIndex = 0;
           updateButtons();
           if (monitoringInterval) {
             clearInterval(monitoringInterval);
