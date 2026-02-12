@@ -7,7 +7,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "check": "astro check"
+    "check": "astro check",
+    "cf:deploy": "astro build && wrangler pages deploy dist",
+    "cf:preview": "astro build && wrangler pages deploy dist --branch preview"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",
@@ -19,6 +21,7 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "tsx": "^4.20.6"
+    "tsx": "^4.20.6",
+    "wrangler": "^4.65.0"
   }
 }

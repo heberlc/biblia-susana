@@ -25,9 +25,10 @@
 - [x] Búsqueda por referencia directa (ej: "Juan 3:16")
 
 ## Fase 4 — Migración Cloudflare Pages
-- [ ] Configurar deploy estático en Cloudflare Pages (Git integration o wrangler)
-- [ ] Verificar build y rutas estáticas en CF Pages
-- [ ] Eliminar `netlify.toml` tras migración exitosa
+- [x] Configurar deploy estático en Cloudflare Pages (wrangler.jsonc + scripts)
+- [x] Headers de seguridad y caché (public/_headers)
+- [x] Eliminar `netlify.toml`
+- [ ] Ejecutar primer deploy (`pnpm deploy`) y verificar
 - [ ] Configurar dominio personalizado (si aplica)
 
 ## Fase 5 — PWA & Offline
