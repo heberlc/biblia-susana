@@ -6,13 +6,18 @@ interface Props {
   description?: string;
 }
 
-const { 
-  title = "Biblia Susana - Lee la Palabra de Dios", 
-  description = "Biblia Susana: Aplicación diseñada para leer y estudiar la Biblia con herramientas accesibles, lectura en voz alta y búsqueda inteligente" 
+const {
+  title = "Biblia Susana - Lee la Palabra de Dios",
+  description = "Biblia Susana: Aplicación diseñada para leer y estudiar la Biblia con herramientas accesibles, lectura en voz alta y búsqueda inteligente",
 } = Astro.props;
+
+const canonicalURL = new URL(
+  Astro.url.pathname,
+  Astro.site || "https://biblia-susana.pages.dev",
+);
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -20,42 +25,101 @@ const {
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalURL} />
     <title>{title}</title>
-    
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:site_name" content="Biblia Susana" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
     <!-- Script inline para evitar flash de contenido -->
     <script is:inline>
-      (function() {
-        const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const theme = savedTheme || (prefersDark ? 'dark' : 'light');
-        
-        if (theme === 'dark') {
-          document.documentElement.classList.add('dark');
+      (function () {
+        const savedTheme = localStorage.getItem("theme");
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        const theme = savedTheme || (prefersDark ? "dark" : "light");
+
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark");
         } else {
-          document.documentElement.classList.remove('dark');
+          document.documentElement.classList.remove("dark");
+        }
+
+        // Restaurar tamaño de fuente
+        const savedSize = localStorage.getItem("fontSize");
+        if (savedSize) {
+          document.documentElement.style.fontSize = savedSize + "px";
         }
       })();
     </script>
   </head>
-  <body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col transition-colors duration-300">
-    <header class="sticky top-0 z-50 bg-blue-700 dark:bg-blue-900 text-white shadow-lg transition-colors duration-300">
+  <body
+    class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col transition-colors duration-300"
+  >
+    <!-- Skip link para accesibilidad -->
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-100 focus:px-4 focus:py-2 focus:bg-yellow-400 focus:text-black focus:rounded-lg focus:font-bold focus:text-lg"
+    >
+      Saltar al contenido
+    </a>
+
+    <header
+      class="sticky top-0 z-50 bg-blue-700 dark:bg-blue-900 text-white shadow-lg transition-colors duration-300"
+    >
       <div class="container mx-auto px-4 py-6">
         <nav class="flex justify-between items-center">
-          <a href="/" class="inline-flex items-center gap-2 hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-blue-300 rounded-lg px-2 py-1">
+          <a
+            href="/"
+            class="inline-flex items-center gap-2 hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-blue-300 rounded-lg px-2 py-1"
+          >
             <span class="text-2xl" aria-hidden="true">📖</span>
             <h1 class="text-2xl sm:text-3xl font-bold">Biblia Susana</h1>
           </a>
-          
-          <!-- Botón de modo nocturno -->
-          <button
-            id="theme-toggle"
-            type="button"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-800 hover:bg-blue-500 dark:hover:bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-300 transition-colors font-semibold"
-            aria-label="Cambiar modo de color"
-          >
-            <span id="theme-icon" class="text-2xl"></span>
-            <span id="theme-text" class="hidden sm:inline"></span>
-          </button>
+
+          <div class="flex items-center gap-2">
+            <!-- Control de tamaño de fuente -->
+            <div
+              class="flex items-center gap-1"
+              role="group"
+              aria-label="Tamaño de texto"
+            >
+              <button
+                id="font-decrease"
+                type="button"
+                class="px-3 py-2 bg-blue-600 dark:bg-blue-800 hover:bg-blue-500 dark:hover:bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-300 transition-colors font-bold text-sm"
+                aria-label="Reducir tamaño de texto">A-</button
+              >
+              <button
+                id="font-increase"
+                type="button"
+                class="px-3 py-2 bg-blue-600 dark:bg-blue-800 hover:bg-blue-500 dark:hover:bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-300 transition-colors font-bold text-lg"
+                aria-label="Aumentar tamaño de texto">A+</button
+              >
+            </div>
+
+            <!-- Botón de modo nocturno -->
+            <button
+              id="theme-toggle"
+              type="button"
+              class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-800 hover:bg-blue-500 dark:hover:bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-300 transition-colors font-semibold"
+              aria-label="Cambiar modo de color"
+            >
+              <span id="theme-icon" class="text-2xl"></span>
+              <span id="theme-text" class="hidden sm:inline"></span>
+            </button>
+          </div>
         </nav>
       </div>
     </header>
@@ -64,71 +128,98 @@ const {
       <slot />
     </main>
 
-    <footer class="bg-gray-800 dark:bg-gray-950 text-white mt-12 transition-colors duration-300">
+    <footer
+      class="bg-gray-800 dark:bg-gray-950 text-white mt-12 transition-colors duration-300"
+    >
       <div class="container mx-auto px-4 py-6">
         <div class="flex flex-col items-center justify-center w-full">
-          <p class="text-lg max-w-none">&copy; {new Date().getFullYear()} Biblia Susana</p>
-          <p class="text-sm text-gray-400 mt-2 max-w-none">Creado con ❤️ por <span class="font-semibold text-blue-400">HeberDev</span></p>
+          <p class="text-lg max-w-none">
+            &copy; {new Date().getFullYear()} Biblia Susana
+          </p>
+          <p class="text-sm text-gray-400 mt-2 max-w-none">
+            Creado con ❤️ por <span class="font-semibold text-blue-400"
+              >HeberDev</span
+            >
+          </p>
         </div>
       </div>
     </footer>
 
-    <!-- Script para el toggle de tema -->
+    <!-- Script para el toggle de tema y tamaño de fuente -->
     <script is:inline>
       function updateThemeUI(isDark) {
-        const icon = document.getElementById('theme-icon');
-        const text = document.getElementById('theme-text');
-        
-        console.log('Actualizando UI, modo oscuro:', isDark);
-        
+        const icon = document.getElementById("theme-icon");
+        const text = document.getElementById("theme-text");
+
         if (icon) {
-          icon.textContent = isDark ? '☀️' : '🌙';
+          icon.textContent = isDark ? "☀️" : "🌙";
         }
         if (text) {
-          text.textContent = isDark ? 'Modo Claro' : 'Modo Nocturno';
+          text.textContent = isDark ? "Modo Claro" : "Modo Nocturno";
         }
       }
 
       function toggleTheme() {
-        console.log('Toggle theme clickeado');
         const html = document.documentElement;
-        const isDark = html.classList.contains('dark');
-        
-        console.log('Estado actual isDark:', isDark);
-        console.log('Clases antes:', html.className);
-        
+        const isDark = html.classList.contains("dark");
+
         if (isDark) {
-          html.classList.remove('dark');
-          localStorage.setItem('theme', 'light');
+          html.classList.remove("dark");
+          localStorage.setItem("theme", "light");
           updateThemeUI(false);
         } else {
-          html.classList.add('dark');
-          localStorage.setItem('theme', 'dark');
+          html.classList.add("dark");
+          localStorage.setItem("theme", "dark");
           updateThemeUI(true);
         }
-        
-        console.log('Clases después:', html.className);
+      }
+
+      // Control de tamaño de fuente
+      var FONT_MIN = 14;
+      var FONT_MAX = 28;
+      var FONT_STEP = 2;
+      var FONT_DEFAULT = 18;
+
+      function getCurrentFontSize() {
+        var saved = localStorage.getItem("fontSize");
+        return saved ? parseInt(saved, 10) : FONT_DEFAULT;
+      }
+
+      function setFontSize(size) {
+        size = Math.max(FONT_MIN, Math.min(FONT_MAX, size));
+        document.documentElement.style.fontSize = size + "px";
+        localStorage.setItem("fontSize", size.toString());
       }
 
       function initTheme() {
-        const html = document.documentElement;
-        const isDark = html.classList.contains('dark');
-        
-        console.log('Inicializando tema, isDark:', isDark);
+        var html = document.documentElement;
+        var isDark = html.classList.contains("dark");
         updateThemeUI(isDark);
 
-        const toggleBtn = document.getElementById('theme-toggle');
+        var toggleBtn = document.getElementById("theme-toggle");
         if (toggleBtn) {
-          console.log('Botón encontrado, asignando onclick');
           toggleBtn.onclick = toggleTheme;
-        } else {
-          console.error('Botón NO encontrado');
+        }
+
+        // Font size controls
+        var decreaseBtn = document.getElementById("font-decrease");
+        var increaseBtn = document.getElementById("font-increase");
+
+        if (decreaseBtn) {
+          decreaseBtn.onclick = function () {
+            setFontSize(getCurrentFontSize() - FONT_STEP);
+          };
+        }
+        if (increaseBtn) {
+          increaseBtn.onclick = function () {
+            setFontSize(getCurrentFontSize() + FONT_STEP);
+          };
         }
       }
 
       // Inicializar cuando el DOM esté listo
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initTheme);
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initTheme);
       } else {
         initTheme();
       }

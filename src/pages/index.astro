@@ -77,15 +77,21 @@ try {
         
         <!-- Pestañas -->
         <div class="mb-8">
-          <div class="flex justify-center gap-4 flex-wrap">
+          <div class="flex justify-center gap-4 flex-wrap" role="tablist" aria-label="Testamentos">
             <button
               id="tabAT"
+              role="tab"
+              aria-selected="true"
+              aria-controls="contentAT"
               class="tab-button active px-8 py-3 text-lg font-bold rounded-lg transition-colors"
             >
               📜 Antiguo Testamento
             </button>
             <button
               id="tabNT"
+              role="tab"
+              aria-selected="false"
+              aria-controls="contentNT"
               class="tab-button px-8 py-3 text-lg font-bold rounded-lg transition-colors"
             >
               ✝️ Nuevo Testamento
@@ -94,7 +100,7 @@ try {
         </div>
 
         <!-- Antiguo Testamento -->
-        <div id="contentAT" class="tab-content">
+        <div id="contentAT" role="tabpanel" aria-labelledby="tabAT" class="tab-content">
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {libros.slice(0, 39).map((libro) => (
               <LibroCard
@@ -107,7 +113,7 @@ try {
         </div>
 
         <!-- Nuevo Testamento -->
-        <div id="contentNT" class="tab-content hidden">
+        <div id="contentNT" role="tabpanel" aria-labelledby="tabNT" class="tab-content hidden">
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {libros.slice(39).map((libro) => (
               <LibroCard
@@ -128,15 +134,19 @@ try {
     const contentAT = document.getElementById('contentAT');
     const contentNT = document.getElementById('contentNT');
 
-    function switchTab(showAT) {
+    function switchTab(showAT: boolean) {
       if (showAT) {
         tabAT?.classList.add('active');
         tabNT?.classList.remove('active');
+        tabAT?.setAttribute('aria-selected', 'true');
+        tabNT?.setAttribute('aria-selected', 'false');
         contentAT?.classList.remove('hidden');
         contentNT?.classList.add('hidden');
       } else {
         tabAT?.classList.remove('active');
         tabNT?.classList.add('active');
+        tabAT?.setAttribute('aria-selected', 'false');
+        tabNT?.setAttribute('aria-selected', 'true');
         contentAT?.classList.add('hidden');
         contentNT?.classList.remove('hidden');
       }

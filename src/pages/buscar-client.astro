@@ -44,18 +44,28 @@ import Layout from "../layouts/Layout.astro";
 
     <!-- Estado de carga -->
     <div id="loading" class="hidden text-center py-12">
-      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div
+        class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
+      >
+      </div>
       <p class="mt-4 text-xl text-gray-600 dark:text-gray-400">Buscando...</p>
     </div>
 
     <!-- Resultados -->
     <div id="results" class="hidden">
-      <h2 id="resultsTitle" class="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100"></h2>
+      <h2
+        id="resultsTitle"
+        class="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100"
+      >
+      </h2>
       <div id="resultsList" class="space-y-6"></div>
     </div>
 
     <!-- Sin resultados -->
-    <div id="noResults" class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg">
+    <div
+      id="noResults"
+      class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg"
+    >
       <p class="font-bold text-xl mb-2">Sin resultados</p>
       <p class="text-lg">
         Intenta con otros términos de búsqueda o verifica la ortografía.
@@ -63,7 +73,10 @@ import Layout from "../layouts/Layout.astro";
     </div>
 
     <!-- Mensaje inicial -->
-    <div id="initialMessage" class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-6 rounded-lg text-center">
+    <div
+      id="initialMessage"
+      class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-6 rounded-lg text-center"
+    >
       <p class="font-bold text-xl mb-2">Búsqueda en la Biblia</p>
       <p class="text-lg">
         Ingresa un término para buscar en todos los versículos de la Biblia.
@@ -75,24 +88,33 @@ import Layout from "../layouts/Layout.astro";
   </div>
 
   <script>
-    import Fuse from 'fuse.js';
-    
-    let fuseInstance = null;
-    let bibliaData = null;
+    import Fuse from "fuse.js";
+    import type { Biblia, Libro, Capitulo, Versiculo } from "../types/bible";
+
+    interface VersiculoIndexado {
+      libro: string;
+      capitulo: number;
+      versiculo: number;
+      titulo: string | null;
+      texto: string;
+    }
+
+    let fuseInstance: Fuse<VersiculoIndexado> | null = null;
+    let bibliaData: Biblia | null = null;
 
     // Cargar la Biblia
-    async function loadBible() {
-      const response = await fetch('/data/biblia-estructurada.json');
+    async function loadBible(): Promise<Biblia> {
+      const response = await fetch("/data/biblia-estructurada.json");
       return await response.json();
     }
 
     // Inicializar búsqueda
-    function initializeSearch(biblia) {
-      const versiculos = [];
-      
-      biblia.libros.forEach(libro => {
-        libro.capitulos.forEach(capitulo => {
-          capitulo.versiculos.forEach(versiculo => {
+    function initializeSearch(biblia: Biblia) {
+      const versiculos: VersiculoIndexado[] = [];
+
+      biblia.libros.forEach((libro: Libro) => {
+        libro.capitulos.forEach((capitulo: Capitulo) => {
+          capitulo.versiculos.forEach((versiculo: Versiculo) => {
             versiculos.push({
               libro: libro.nombre,
               capitulo: capitulo.numero,
@@ -105,7 +127,7 @@ import Layout from "../layouts/Layout.astro";
       });
 
       const options = {
-        keys: ['texto', 'titulo'],
+        keys: ["texto", "titulo"],
         threshold: 0.4,
         includeScore: true,
         minMatchCharLength: 3,
@@ -116,45 +138,54 @@ import Layout from "../layouts/Layout.astro";
     }
 
     // Buscar
-    function buscar(query) {
+    function buscar(query: string): VersiculoIndexado[] {
       if (!fuseInstance || !query || query.trim().length < 2) {
         return [];
       }
 
       const resultados = fuseInstance.search(query);
-      return resultados.map(r => r.item);
+      return resultados.map((r) => r.item);
     }
 
     // Mostrar resultados
-    function displayResults(query, resultados) {
-      const loading = document.getElementById('loading');
-      const results = document.getElementById('results');
-      const noResults = document.getElementById('noResults');
-      const initialMessage = document.getElementById('initialMessage');
-      const resultsTitle = document.getElementById('resultsTitle');
-      const resultsList = document.getElementById('resultsList');
+    function displayResults(query: string, resultados: VersiculoIndexado[]) {
+      const loading = document.getElementById("loading");
+      const results = document.getElementById("results");
+      const noResults = document.getElementById("noResults");
+      const initialMessage = document.getElementById("initialMessage");
+      const resultsTitle = document.getElementById("resultsTitle");
+      const resultsList = document.getElementById("resultsList");
 
-      loading.classList.add('hidden');
-      initialMessage.classList.add('hidden');
+      loading?.classList.add("hidden");
+      initialMessage?.classList.add("hidden");
 
       if (resultados.length === 0) {
-        results.classList.add('hidden');
-        noResults.classList.remove('hidden');
+        results?.classList.add("hidden");
+        noResults?.classList.remove("hidden");
         return;
       }
 
-      noResults.classList.add('hidden');
-      results.classList.remove('hidden');
-      
-      resultsTitle.textContent = `${resultados.length} resultado${resultados.length !== 1 ? 's' : ''} para "${query}"`;
-      
-      resultsList.innerHTML = resultados.map(resultado => `
+      noResults?.classList.add("hidden");
+      results?.classList.remove("hidden");
+
+      if (resultsTitle) {
+        resultsTitle.textContent = `${resultados.length} resultado${resultados.length !== 1 ? "s" : ""} para "${query}"`;
+      }
+
+      if (resultsList) {
+        resultsList.innerHTML = resultados
+          .map(
+            (resultado: VersiculoIndexado) => `
         <article class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border-l-4 border-blue-500 dark:border-blue-400">
-          ${resultado.titulo ? `
+          ${
+            resultado.titulo
+              ? `
             <h3 class="text-lg font-bold text-blue-700 dark:text-blue-400 mb-2">
               ${resultado.titulo}
             </h3>
-          ` : ''}
+          `
+              : ""
+          }
           <header class="mb-4">
             <h3 class="text-xl font-bold text-blue-700 dark:text-blue-400">
               <a 
@@ -181,47 +212,58 @@ import Layout from "../layouts/Layout.astro";
             </a>
           </div>
         </article>
-      `).join('');
+      `,
+          )
+          .join("");
+      }
     }
 
     // Manejar formulario
-    document.getElementById('searchForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const query = document.getElementById('searchInput').value.trim();
-      if (!query) return;
+    document
+      .getElementById("searchForm")
+      ?.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-      const loading = document.getElementById('loading');
-      const results = document.getElementById('results');
-      const noResults = document.getElementById('noResults');
-      const initialMessage = document.getElementById('initialMessage');
+        const searchInput = document.getElementById(
+          "searchInput",
+        ) as HTMLInputElement | null;
+        const query = searchInput?.value.trim() ?? "";
+        if (!query) return;
 
-      loading.classList.remove('hidden');
-      results.classList.add('hidden');
-      noResults.classList.add('hidden');
-      initialMessage.classList.add('hidden');
+        const loading = document.getElementById("loading");
+        const results = document.getElementById("results");
+        const noResults = document.getElementById("noResults");
+        const initialMessage = document.getElementById("initialMessage");
 
-      try {
-        if (!bibliaData) {
-          bibliaData = await loadBible();
-          initializeSearch(bibliaData);
+        loading?.classList.remove("hidden");
+        results?.classList.add("hidden");
+        noResults?.classList.add("hidden");
+        initialMessage?.classList.add("hidden");
+
+        try {
+          if (!bibliaData) {
+            bibliaData = await loadBible();
+            initializeSearch(bibliaData);
+          }
+
+          const resultados = buscar(query);
+          displayResults(query, resultados);
+        } catch (error) {
+          console.error("Error en búsqueda:", error);
+          loading?.classList.add("hidden");
+          alert("Error al buscar. Por favor intenta de nuevo.");
         }
-
-        const resultados = buscar(query);
-        displayResults(query, resultados);
-      } catch (error) {
-        console.error('Error en búsqueda:', error);
-        loading.classList.add('hidden');
-        alert('Error al buscar. Por favor intenta de nuevo.');
-      }
-    });
+      });
 
     // Verificar si hay query en URL
     const urlParams = new URLSearchParams(window.location.search);
-    const queryParam = urlParams.get('q');
+    const queryParam = urlParams.get("q");
     if (queryParam) {
-      document.getElementById('searchInput').value = queryParam;
-      document.getElementById('searchForm').dispatchEvent(new Event('submit'));
+      const searchInput = document.getElementById(
+        "searchInput",
+      ) as HTMLInputElement | null;
+      if (searchInput) searchInput.value = queryParam;
+      document.getElementById("searchForm")?.dispatchEvent(new Event("submit"));
     }
   </script>
 </Layout>
