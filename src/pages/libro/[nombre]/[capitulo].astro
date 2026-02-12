@@ -98,7 +98,7 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
         <!-- Botón para leer todo el capítulo -->
         <div class="mb-8 flex justify-center">
           <ChapterSpeechButton 
-            text={capitulo.versiculos.map(v => v.texto).join(' ')}
+            versiculos={capitulo.versiculos.map(v => ({ numero: v.numero, texto: v.texto, titulo: v.titulo }))}
             label="Leer capítulo completo"
           />
         </div>

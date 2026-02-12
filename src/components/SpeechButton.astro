@@ -6,8 +6,8 @@ interface Props {
   className?: string;
 }
 
-const { text, label = "Leer", className = "" } = Astro.props;
-const uniqueId = `speech-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const { text, label = "Leer" } = Astro.props;
+const uniqueId = `speech-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 ---
 
 <div class="flex flex-col gap-2">
@@ -34,7 +34,12 @@ const uniqueId = `speech-${Date.now()}-${Math.random().toString(36).substr(2, 9)
 </div>
 
 <script>
-  import { speechRead, speechStop, initSpeech, isSpeaking } from '../lib/speech';
+  import {
+    speechRead,
+    speechStop,
+    initSpeech,
+    isSpeaking,
+  } from "../lib/speech";
 
   // Inicializar Web Speech API
   initSpeech();
@@ -44,67 +49,69 @@ const uniqueId = `speech-${Date.now()}-${Math.random().toString(36).substr(2, 9)
   // Función para actualizar el estado de los botones
   function updateButtons(activeSpeechId: string | null) {
     const speaking = isSpeaking();
-    const allStopButtons = document.querySelectorAll('.btn-stop-speech');
-    
-    allStopButtons.forEach(btn => {
-      const btnId = btn.getAttribute('data-speech-id');
+    const allStopButtons = document.querySelectorAll(".btn-stop-speech");
+
+    allStopButtons.forEach((btn) => {
+      const btnId = btn.getAttribute("data-speech-id");
       if (speaking && btnId === activeSpeechId) {
-        btn.classList.remove('hidden');
-        btn.classList.add('inline-flex');
+        btn.classList.remove("hidden");
+        btn.classList.add("inline-flex");
       } else {
-        btn.classList.add('hidden');
-        btn.classList.remove('inline-flex');
+        btn.classList.add("hidden");
+        btn.classList.remove("inline-flex");
       }
     });
   }
-  
+
   // Función para resetear los botones del capítulo
   function resetChapterButtons() {
     // Detener cualquier reproducción de capítulo
     speechStop();
-    
+
     // Buscar todos los botones de capítulo y resetear su estado
-    const chapterControls = document.querySelectorAll('[id^="controls-chapter-"]');
-    chapterControls.forEach(container => {
-      const playBtn = container.querySelector('.btn-play-chapter');
-      const pauseBtn = container.querySelector('.btn-pause-chapter');
-      const resumeBtn = container.querySelector('.btn-resume-chapter');
-      const stopBtn = container.querySelector('.btn-stop-chapter');
-      
-      playBtn?.classList.remove('hidden');
-      pauseBtn?.classList.add('hidden');
-      resumeBtn?.classList.add('hidden');
-      stopBtn?.classList.add('hidden');
+    const chapterControls = document.querySelectorAll(
+      '[id^="controls-chapter-"]',
+    );
+    chapterControls.forEach((container) => {
+      const playBtn = container.querySelector(".btn-play-chapter");
+      const pauseBtn = container.querySelector(".btn-pause-chapter");
+      const resumeBtn = container.querySelector(".btn-resume-chapter");
+      const stopBtn = container.querySelector(".btn-stop-chapter");
+
+      playBtn?.classList.remove("hidden");
+      pauseBtn?.classList.add("hidden");
+      resumeBtn?.classList.add("hidden");
+      stopBtn?.classList.add("hidden");
     });
-    
+
     // Disparar evento personalizado para que ChapterSpeechButton se resetee
-    window.dispatchEvent(new CustomEvent('verse-speech-started'));
+    window.dispatchEvent(new CustomEvent("verse-speech-started"));
   }
 
   // Agregar listeners a todos los botones de speech
-  document.addEventListener('DOMContentLoaded', () => {
-    const buttons = document.querySelectorAll('.btn-speech');
-    const stopButtons = document.querySelectorAll('.btn-stop-speech');
-    
-    buttons.forEach(button => {
-      button.addEventListener('click', (e) => {
+  document.addEventListener("DOMContentLoaded", () => {
+    const buttons = document.querySelectorAll(".btn-speech");
+    const stopButtons = document.querySelectorAll(".btn-stop-speech");
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", (e) => {
         const target = e.currentTarget as HTMLButtonElement;
-        const text = target.dataset.text || target.getAttribute('data-text');
-        const speechId = target.getAttribute('data-speech-id');
-        
+        const text = target.dataset.text || target.getAttribute("data-text");
+        const speechId = target.getAttribute("data-speech-id");
+
         if (text && speechId) {
           // Resetear controles del capítulo antes de leer el verso
           resetChapterButtons();
-          
+
           speechStop();
           currentActiveSpeechId = speechId;
           speechRead(text);
-          
+
           // Esperar un momento para que comience a hablar
           setTimeout(() => {
             updateButtons(currentActiveSpeechId);
           }, 100);
-          
+
           // Actualizar botones periódicamente mientras habla
           const interval = setInterval(() => {
             updateButtons(currentActiveSpeechId);
@@ -118,8 +125,8 @@ const uniqueId = `speech-${Date.now()}-${Math.random().toString(36).substr(2, 9)
       });
     });
 
-    stopButtons.forEach(button => {
-      button.addEventListener('click', () => {
+    stopButtons.forEach((button) => {
+      button.addEventListener("click", () => {
         speechStop();
         currentActiveSpeechId = null;
         updateButtons(null);

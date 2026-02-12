@@ -8,14 +8,14 @@
 - [x] Control de tamaño de fuente `A-/A+` en header
 
 ## Fase 2 — Mejoras de Audio
-- [ ] Selector inteligente de voz española (auto-elegir Neural > Google > Apple)
-- [ ] Lectura versículo por versículo (reemplazar chunking por caracteres)
-- [ ] Highlight + auto-scroll del versículo activo durante lectura
-- [ ] Barra de progreso (versículo X de Y)
-- [ ] Control de velocidad (slider 0.5x–2.0x)
-- [ ] Persistir preferencias de voz y velocidad en localStorage
-- [ ] Eliminar console.logs de `ChapterSpeechButton.astro`
-- [ ] Tip en la UI recomendando Edge para mejor calidad de voz
+- [x] Selector inteligente de voz española (auto-elegir Neural > Google > Apple)
+- [x] Lectura versículo por versículo (reemplazar chunking por caracteres)
+- [x] Highlight + auto-scroll del versículo activo durante lectura
+- [x] Barra de progreso (versículo X de Y)
+- [x] Control de velocidad (slider 0.5x–2.0x)
+- [x] Persistir preferencias de voz y velocidad en localStorage
+- [x] Eliminar console.logs de `ChapterSpeechButton.astro`
+- [x] Tip en la UI recomendando Edge para mejor calidad de voz
 
 ## Fase 3 — Features UX
 - [ ] Guardar progreso de lectura (último capítulo, localStorage)
