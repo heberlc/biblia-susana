@@ -1,0 +1,51 @@
+---
+// Componente de breadcrumbs semántico
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  items: BreadcrumbItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav aria-label="Breadcrumb" class="mb-8">
+  <ol class="flex flex-wrap items-center gap-2 text-lg">
+    <li class="flex items-center">
+      <a
+        href="/"
+        class="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline font-semibold"
+      >
+        <span aria-hidden="true">🏠</span>
+        Inicio
+      </a>
+    </li>
+    {
+      items.map((item, i) => (
+        <li class="flex items-center gap-2">
+          <span class="text-gray-400 dark:text-gray-500" aria-hidden="true">
+            ›
+          </span>
+          {item.href ? (
+            <a
+              href={item.href}
+              class="text-blue-600 dark:text-blue-400 hover:underline font-semibold"
+            >
+              {item.label}
+            </a>
+          ) : (
+            <span
+              class="text-gray-700 dark:text-gray-300 font-semibold"
+              aria-current="page"
+            >
+              {item.label}
+            </span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>

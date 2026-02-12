@@ -18,11 +18,11 @@
 - [x] Tip en la UI recomendando Edge para mejor calidad de voz
 
 ## Fase 3 — Features UX
-- [ ] Guardar progreso de lectura (último capítulo, localStorage)
-- [ ] Versículo del día en homepage
-- [ ] Botón de compartir versículos (Web Share API + copiar enlace)
-- [ ] Breadcrumbs en todas las páginas
-- [ ] Búsqueda por referencia directa (ej: "Juan 3:16")
+- [x] Guardar progreso de lectura (último capítulo, localStorage)
+- [x] Versículo del día en homepage
+- [x] Botón de compartir versículos (Web Share API + copiar enlace)
+- [x] Breadcrumbs en todas las páginas
+- [x] Búsqueda por referencia directa (ej: "Juan 3:16")
 
 ## Fase 4 — Migración Cloudflare Pages
 - [ ] Configurar deploy estático en Cloudflare Pages (Git integration o wrangler)

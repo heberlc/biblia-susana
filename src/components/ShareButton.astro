@@ -1,0 +1,81 @@
+---
+// Botón de compartir versículo con Web Share API + fallback copiar enlace
+interface Props {
+  libro: string;
+  capitulo: number;
+  versiculo: number;
+  texto: string;
+}
+
+const { libro, capitulo, versiculo, texto } = Astro.props;
+const shareData = JSON.stringify({ libro, capitulo, versiculo, texto });
+---
+
+<button
+  type="button"
+  class="btn-share inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-800/40 focus:ring-2 focus:ring-purple-300 transition-colors font-semibold"
+  data-share={shareData}
+  aria-label={`Compartir ${libro} ${capitulo}:${versiculo}`}
+>
+  <span aria-hidden="true">🔗</span>
+  <span>Compartir</span>
+</button>
+
+<script>
+  function initShareButtons() {
+    document.querySelectorAll(".btn-share").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        const raw = target.dataset.share;
+        if (!raw) return;
+
+        const data = JSON.parse(raw) as {
+          libro: string;
+          capitulo: number;
+          versiculo: number;
+          texto: string;
+        };
+
+        const url = `${window.location.origin}/libro/${encodeURIComponent(data.libro)}/${data.capitulo}#v${data.versiculo}`;
+        const shareText = `"${data.texto}" — ${data.libro} ${data.capitulo}:${data.versiculo}`;
+
+        // Intentar Web Share API
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: `${data.libro} ${data.capitulo}:${data.versiculo}`,
+              text: shareText,
+              url,
+            });
+            return;
+          } catch {
+            // El usuario canceló o error, fallback a copiar
+          }
+        }
+
+        // Fallback: copiar al portapapeles
+        try {
+          await navigator.clipboard.writeText(`${shareText}\n${url}`);
+          // Feedback visual
+          const originalHTML = target.innerHTML;
+          target.innerHTML =
+            '<span aria-hidden="true">✅</span> <span>Copiado</span>';
+          target.classList.add("bg-green-100", "text-green-700");
+          setTimeout(() => {
+            target.innerHTML = originalHTML;
+            target.classList.remove("bg-green-100", "text-green-700");
+          }, 2000);
+        } catch {
+          // Sin permisos de portapapeles
+          prompt("Copia este enlace:", `${shareText}\n${url}`);
+        }
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initShareButtons);
+  } else {
+    initShareButtons();
+  }
+</script>

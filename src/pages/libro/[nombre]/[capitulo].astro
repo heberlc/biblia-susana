@@ -2,6 +2,8 @@
 import Layout from "../../../layouts/Layout.astro";
 import SpeechButton from "../../../components/SpeechButton.astro";
 import ChapterSpeechButton from "../../../components/ChapterSpeechButton.astro";
+import Breadcrumbs from "../../../components/Breadcrumbs.astro";
+import ShareButton from "../../../components/ShareButton.astro";
 import { loadBible } from "../../../lib/loadBible";
 import type { Libro, Capitulo } from "../../../types/bible";
 
@@ -58,23 +60,10 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
   description={`${libro?.nombre} capítulo ${capituloNum} - Lee versículo por versículo con audio. Biblia Susana`}
 >
   <div class="max-w-4xl mx-auto">
-    <!-- Navegación superior -->
-    <nav class="mb-8 flex flex-wrap gap-4" aria-label="Navegación">
-      <a
-        href="/"
-        class="inline-flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 transition-colors font-semibold text-lg"
-      >
-        <span class="text-xl" aria-hidden="true">🏠</span>
-        Inicio
-      </a>
-      <a
-        href={`/libro/${encodeURIComponent(nombre || '')}`}
-        class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors font-semibold text-lg"
-      >
-        <span class="text-xl" aria-hidden="true">📖</span>
-        {libro?.nombre}
-      </a>
-    </nav>
+    <Breadcrumbs items={[
+      { label: libro?.nombre || '', href: `/libro/${encodeURIComponent(nombre || '')}` },
+      { label: `Capítulo ${capituloNum}` }
+    ]} />
 
     {error && (
       <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-6 rounded-lg" role="alert">
@@ -124,11 +113,18 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
                   <p class="text-xl text-gray-800 dark:text-gray-200 leading-relaxed mb-4">
                     {versiculo.texto}
                   </p>
-                  <SpeechButton 
-                    text={`${versiculo.titulo ? versiculo.titulo + '. ' : ''}${libro.nombre} ${capituloNum} ${versiculo.numero}. ${versiculo.texto}`}
-                    label="Escuchar versículo"
-                    className="text-base"
-                  />
+                  <div class="flex flex-wrap gap-2">
+                    <SpeechButton 
+                      text={`${versiculo.titulo ? versiculo.titulo + '. ' : ''}${libro.nombre} ${capituloNum} ${versiculo.numero}. ${versiculo.texto}`}
+                      label="Escuchar"
+                    />
+                    <ShareButton
+                      libro={libro.nombre}
+                      capitulo={capituloNum}
+                      versiculo={versiculo.numero}
+                      texto={versiculo.texto}
+                    />
+                  </div>
                 </div>
               </div>
             </article>
@@ -214,19 +210,27 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
 </style>
 
 <script>
+  // Guardar progreso de lectura
+  try {
+    const progress = {
+      libro: document.querySelector('h1')?.textContent?.replace(/\s+\d+$/, '').trim() || '',
+      capitulo: parseInt(window.location.pathname.split('/').pop() || '1', 10),
+      url: window.location.pathname,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem('biblia-reading-progress', JSON.stringify(progress));
+  } catch { /* localStorage no disponible */ }
+
   // Hacer scroll al versículo si hay hash en la URL
   if (window.location.hash) {
     const hash = window.location.hash;
     const element = document.querySelector(hash);
     
     if (element) {
-      // Esperar a que todo cargue
       setTimeout(() => {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        // Agregar animación de resaltado
         element.classList.add('verse-highlight');
         
-        // Remover la clase después de la animación
         setTimeout(() => {
           element.classList.remove('verse-highlight');
         }, 2000);
