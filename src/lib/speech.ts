@@ -69,8 +69,11 @@ export function getBestSpanishVoice(): SpeechSynthesisVoice | null {
 export function initSpeech(): void {
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     synth = window.speechSynthesis;
-    // Las voces pueden cargarse async en algunos browsers
-    synth.onvoiceschanged = () => { /* voces actualizadas */ };
+    // Forzar carga de voces (en móvil son async)
+    synth.getVoices();
+    synth.onvoiceschanged = () => {
+      synth?.getVoices();
+    };
   }
 }
 

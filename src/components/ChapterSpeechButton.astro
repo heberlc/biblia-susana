@@ -170,6 +170,16 @@ const versiculosJSON = JSON.stringify(versiculos);
       return spanish[0];
     }
 
+    // Pre-cargar voces al inicio (móvil las carga async)
+    function preloadVoices() {
+      window.speechSynthesis.getVoices();
+      if (typeof window.speechSynthesis.onvoiceschanged !== "undefined") {
+        window.speechSynthesis.onvoiceschanged = function () {
+          window.speechSynthesis.getVoices();
+        };
+      }
+    }
+
     function initControls() {
       var playBtn = document.getElementById("play-" + controlsId);
       var pauseBtn = document.getElementById("pause-" + controlsId);
@@ -181,11 +191,15 @@ const versiculosJSON = JSON.stringify(versiculos);
       var progressBar = document.getElementById("progress-bar-" + controlsId);
       var progressText = document.getElementById("progress-text-" + controlsId);
 
-      if (!playBtn) return;
+      if (!playBtn || !window.speechSynthesis) return;
 
-      var currentVerseIndex = 0;
+      // Pre-cargar voces lo antes posible
+      preloadVoices();
+
+      var currentIndex = 0;
       var isPlaying = false;
       var isPausedManually = false;
+      var keepAliveTimer = null; // Workaround para Chrome mobile
 
       // Inicializar slider de velocidad
       var currentRate = getSavedRate();
@@ -265,6 +279,7 @@ const versiculosJSON = JSON.stringify(versiculos);
           isPausedManually = false;
           clearHighlight();
           updateButtons();
+          stopKeepAlive();
           if (progressContainer) {
             setTimeout(function () {
               progressContainer.classList.add("hidden");
@@ -273,7 +288,7 @@ const versiculosJSON = JSON.stringify(versiculos);
           return;
         }
 
-        currentVerseIndex = index;
+        currentIndex = index;
         var verse = verses[index];
         highlightVerse(verse.numero);
         updateProgress(index, verses.length);
@@ -291,11 +306,15 @@ const versiculosJSON = JSON.stringify(versiculos);
         }
 
         utterance.onend = function () {
-          speakVerse(index + 1);
+          if (isPlaying) speakVerse(index + 1);
         };
 
         utterance.onerror = function (ev) {
-          if (ev.error !== "interrupted" && ev.error !== "canceled") {
+          if (
+            ev.error !== "interrupted" &&
+            ev.error !== "canceled" &&
+            isPlaying
+          ) {
             speakVerse(index + 1);
           }
         };
@@ -303,16 +322,39 @@ const versiculosJSON = JSON.stringify(versiculos);
         window.speechSynthesis.speak(utterance);
       }
 
-      // Play
+      // Chrome mobile workaround: speech se pausa silenciosamente tras ~15s
+      function startKeepAlive() {
+        stopKeepAlive();
+        keepAliveTimer = setInterval(function () {
+          if (
+            window.speechSynthesis.speaking &&
+            !window.speechSynthesis.paused &&
+            !isPausedManually
+          ) {
+            window.speechSynthesis.pause();
+            window.speechSynthesis.resume();
+          }
+        }, 5000);
+      }
+
+      function stopKeepAlive() {
+        if (keepAliveTimer) {
+          clearInterval(keepAliveTimer);
+          keepAliveTimer = null;
+        }
+      }
+
+      // Play — speakVerse DEBE llamarse síncronamente desde el click (user gesture)
       playBtn.addEventListener("click", function () {
         if (!window.speechSynthesis || verses.length === 0) return;
 
         window.speechSynthesis.cancel();
-        currentVerseIndex = 0;
+        currentIndex = 0;
         isPlaying = true;
         isPausedManually = false;
         updateButtons();
         speakVerse(0);
+        startKeepAlive();
       });
 
       // Pause
@@ -334,6 +376,7 @@ const versiculosJSON = JSON.stringify(versiculos);
           window.speechSynthesis.resume();
           isPausedManually = false;
           updateButtons();
+          startKeepAlive();
         }
       });
 
@@ -344,9 +387,10 @@ const versiculosJSON = JSON.stringify(versiculos);
         }
         isPlaying = false;
         isPausedManually = false;
-        currentVerseIndex = 0;
+        currentIndex = 0;
         clearHighlight();
         updateButtons();
+        stopKeepAlive();
         if (progressContainer) progressContainer.classList.add("hidden");
       });
 
@@ -355,9 +399,10 @@ const versiculosJSON = JSON.stringify(versiculos);
         if (window.speechSynthesis) window.speechSynthesis.cancel();
         isPlaying = false;
         isPausedManually = false;
-        currentVerseIndex = 0;
+        currentIndex = 0;
         clearHighlight();
         updateButtons();
+        stopKeepAlive();
         if (progressContainer) progressContainer.classList.add("hidden");
       });
     }

@@ -28,8 +28,8 @@
 - [x] Configurar deploy estático en Cloudflare Pages (wrangler.jsonc + scripts)
 - [x] Headers de seguridad y caché (public/_headers)
 - [x] Eliminar `netlify.toml`
-- [ ] Ejecutar primer deploy (`pnpm deploy`) y verificar
-- [ ] Configurar dominio personalizado (si aplica)
+- [x] Ejecutar primer deploy (`pnpm deploy`) y verificar
+- [x] Configurar dominio personalizado (si aplica)
 
 ## Fase 5 — PWA & Offline
 - [ ] Crear `manifest.json` con iconos

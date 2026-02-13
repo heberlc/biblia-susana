@@ -89,7 +89,7 @@ const uniqueId = `speech-${Date.now()}-${Math.random().toString(36).substring(2,
   }
 
   // Agregar listeners a todos los botones de speech
-  document.addEventListener("DOMContentLoaded", () => {
+  function initSpeechButtons() {
     const buttons = document.querySelectorAll(".btn-speech");
     const stopButtons = document.querySelectorAll(".btn-stop-speech");
 
@@ -103,24 +103,18 @@ const uniqueId = `speech-${Date.now()}-${Math.random().toString(36).substring(2,
           // Resetear controles del capítulo antes de leer el verso
           resetChapterButtons();
 
-          speechStop();
+          // Cancelar speech previo y hablar directamente (sin setTimeout)
+          window.speechSynthesis?.cancel();
           currentActiveSpeechId = speechId;
-          speechRead(text);
 
-          // Esperar un momento para que comience a hablar
-          setTimeout(() => {
-            updateButtons(currentActiveSpeechId);
-          }, 100);
+          // Llamar speechRead con callback onEnd para limpiar botones
+          speechRead(text, () => {
+            currentActiveSpeechId = null;
+            updateButtons(null);
+          });
 
-          // Actualizar botones periódicamente mientras habla
-          const interval = setInterval(() => {
-            updateButtons(currentActiveSpeechId);
-            if (!isSpeaking()) {
-              currentActiveSpeechId = null;
-              updateButtons(null);
-              clearInterval(interval);
-            }
-          }, 500);
+          // Actualizar botones inmediatamente
+          updateButtons(currentActiveSpeechId);
         }
       });
     });
@@ -132,5 +126,11 @@ const uniqueId = `speech-${Date.now()}-${Math.random().toString(36).substring(2,
         updateButtons(null);
       });
     });
-  });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSpeechButtons);
+  } else {
+    initSpeechButtons();
+  }
 </script>
