@@ -32,9 +32,9 @@
 - [x] Configurar dominio personalizado (si aplica)
 
 ## Fase 5 — PWA & Offline
-- [ ] Crear `manifest.json` con iconos
-- [ ] Implementar Service Worker con cache para lectura offline
-- [ ] Agregar meta tags PWA en `Layout.astro`
+- [x] Crear `manifest.json` con iconos
+- [x] Implementar Service Worker con cache para lectura offline
+- [x] Agregar meta tags PWA en `Layout.astro`
 
 ## Fase 6 — Optimización & Polish
 - [ ] Mejora visual (tipografía premium, gradientes, iconos SVG)
@@ -51,3 +51,4 @@
 - [ ] Plan de lectura diaria (365 días)
 - [ ] Pre-generar audio MP3 para capítulos populares (Kokoro-TTS)
 - [ ] Pages Function para búsqueda server-side con KV
+

@@ -25,7 +25,14 @@ const canonicalURL = new URL(
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
     <link rel="canonical" href={canonicalURL} />
+    <meta name="theme-color" content="#1d4ed8" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Biblia Susana" />
     <title>{title}</title>
 
     <!-- Open Graph -->
@@ -222,6 +229,15 @@ const canonicalURL = new URL(
         document.addEventListener("DOMContentLoaded", initTheme);
       } else {
         initTheme();
+      }
+
+      // Registrar Service Worker para offline/PWA
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").catch(function () {
+            // Ignorar en contextos no compatibles
+          });
+        });
       }
     </script>
   </body>

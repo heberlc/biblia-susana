@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="t">
+  <title id="t">Biblia Susana icon 512</title>
+  <rect width="512" height="512" rx="96" fill="#1d4ed8"/>
+  <rect x="108" y="96" width="296" height="320" rx="32" fill="#ffffff"/>
+  <rect x="140" y="130" width="26" height="252" rx="13" fill="#93c5fd"/>
+  <path d="M194 210h164M194 258h164M194 306h124" stroke="#1e40af" stroke-width="18" stroke-linecap="round"/>
+  <path d="M256 378v-78M220 340h72" stroke="#1d4ed8" stroke-width="24" stroke-linecap="round"/>
+</svg>
