@@ -37,10 +37,10 @@
 - [x] Agregar meta tags PWA en `Layout.astro`
 
 ## Fase 6 — Optimización & Polish
-- [ ] Mejora visual (tipografía premium, gradientes, iconos SVG)
-- [ ] Dividir `biblia-estructurada.json` por libro
-- [ ] Optimizar índice de búsqueda (pre-computar en build)
-- [ ] Lazy loading de versículos en capítulos largos
+- [x] Mejora visual (tipografia premium, gradientes, iconos SVG)
+- [x] Dividir `biblia-estructurada.json` por libro
+- [x] Optimizar indice de busqueda (pre-computar en build)
+- [x] Lazy loading de versiculos en capitulos largos
 
 ## Fase 7 — Testing
 - [ ] Tests unitarios para `search.ts` y `loadBible.ts`
@@ -51,4 +51,5 @@
 - [ ] Plan de lectura diaria (365 días)
 - [ ] Pre-generar audio MP3 para capítulos populares (Kokoro-TTS)
 - [ ] Pages Function para búsqueda server-side con KV
+
 

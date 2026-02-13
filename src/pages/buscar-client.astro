@@ -3,11 +3,10 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout
-  title="Buscar Versículos - Biblia Susana"
-  description="Busca versículos en toda la Biblia. Búsqueda inteligente por texto, títulos y referencias bíblicas"
+  title="Buscar Versiculos - Biblia Susana"
+  description="Busca versiculos en toda la Biblia. Busqueda inteligente por texto, titulos y referencias biblicas"
 >
   <div class="max-w-5xl mx-auto">
-    <!-- Formulario de búsqueda -->
     <section class="mb-8">
       <form id="searchForm" class="mb-6">
         <div class="flex flex-col md:flex-row gap-4">
@@ -16,7 +15,7 @@ import Layout from "../layouts/Layout.astro";
             type="search"
             id="searchInput"
             name="q"
-            placeholder="Buscar versículos... (ej: amor, fe, esperanza)"
+            placeholder="Buscar versiculos... (ej: amor, fe, esperanza)"
             class="flex-1 px-6 py-4 text-xl border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded-lg focus:border-blue-500 focus:ring-4 focus:ring-blue-300 transition-colors"
             required
             autofocus
@@ -25,7 +24,7 @@ import Layout from "../layouts/Layout.astro";
             type="submit"
             class="btn-large bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors shadow-lg px-8"
           >
-            <span class="text-2xl mr-2" aria-hidden="true">🔍</span>
+            <span class="text-2xl mr-2" aria-hidden="true">&#128269;</span>
             Buscar
           </button>
         </div>
@@ -36,60 +35,36 @@ import Layout from "../layouts/Layout.astro";
           href="/"
           class="inline-flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 transition-colors font-semibold text-lg"
         >
-          <span class="text-xl" aria-hidden="true">🏠</span>
+          <span class="text-xl" aria-hidden="true">&#127968;</span>
           Volver al Inicio
         </a>
       </div>
     </section>
 
-    <!-- Estado de carga -->
     <div id="loading" class="hidden text-center py-12">
-      <div
-        class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
-      >
-      </div>
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       <p class="mt-4 text-xl text-gray-600 dark:text-gray-400">Buscando...</p>
     </div>
 
-    <!-- Resultados -->
     <div id="results" class="hidden">
-      <h2
-        id="resultsTitle"
-        class="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100"
-      >
-      </h2>
+      <h2 id="resultsTitle" class="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100"></h2>
       <div id="resultsList" class="space-y-6"></div>
     </div>
 
-    <!-- Sin resultados -->
-    <div
-      id="noResults"
-      class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg"
-    >
+    <div id="noResults" class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg">
       <p class="font-bold text-xl mb-2">Sin resultados</p>
-      <p class="text-lg">
-        Intenta con otros términos de búsqueda o verifica la ortografía.
-      </p>
+      <p class="text-lg">Intenta con otros terminos de busqueda o verifica la ortografia.</p>
     </div>
 
-    <!-- Mensaje inicial -->
-    <div
-      id="initialMessage"
-      class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-6 rounded-lg text-center"
-    >
-      <p class="font-bold text-xl mb-2">Búsqueda en la Biblia</p>
-      <p class="text-lg">
-        Ingresa un término para buscar en todos los versículos de la Biblia.
-      </p>
-      <p class="text-sm mt-4 text-blue-600">
-        Ejemplos: amor, fe, esperanza, paz, jesús
-      </p>
+    <div id="initialMessage" class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-6 rounded-lg text-center">
+      <p class="font-bold text-xl mb-2">Busqueda en la Biblia</p>
+      <p class="text-lg">Ingresa un termino para buscar en todos los versiculos de la Biblia.</p>
+      <p class="text-sm mt-4 text-blue-600">Ejemplos: amor, fe, esperanza, paz, jesus</p>
     </div>
   </div>
 
   <script>
     import Fuse from "fuse.js";
-    import type { Biblia, Libro, Capitulo, Versiculo } from "../types/bible";
 
     interface VersiculoIndexado {
       libro: string;
@@ -99,47 +74,37 @@ import Layout from "../layouts/Layout.astro";
       texto: string;
     }
 
-    let fuseInstance: Fuse<VersiculoIndexado> | null = null;
-    let bibliaData: Biblia | null = null;
+    interface SearchIndexPayload {
+      docs: VersiculoIndexado[];
+      index: any;
+      options: {
+        keys: string[];
+        threshold: number;
+        includeScore: boolean;
+        minMatchCharLength: number;
+        ignoreLocation: boolean;
+      };
+    }
 
-    // Cargar la Biblia
-    async function loadBible(): Promise<Biblia> {
-      const response = await fetch("/data/biblia-estructurada.json");
+    let fuseInstance: Fuse<VersiculoIndexado> | null = null;
+    let searchReady = false;
+
+    async function loadPrecomputedSearchIndex(): Promise<SearchIndexPayload> {
+      const response = await fetch("/data/search-index.json");
+      if (!response.ok) {
+        throw new Error("No se pudo cargar search-index.json");
+      }
       return await response.json();
     }
 
-    // Inicializar búsqueda
-    function initializeSearch(biblia: Biblia) {
-      const versiculos: VersiculoIndexado[] = [];
-
-      biblia.libros.forEach((libro: Libro) => {
-        libro.capitulos.forEach((capitulo: Capitulo) => {
-          capitulo.versiculos.forEach((versiculo: Versiculo) => {
-            versiculos.push({
-              libro: libro.nombre,
-              capitulo: capitulo.numero,
-              versiculo: versiculo.numero,
-              titulo: versiculo.titulo || null,
-              texto: versiculo.texto,
-            });
-          });
-        });
-      });
-
-      const options = {
-        keys: ["texto", "titulo"],
-        threshold: 0.4,
-        includeScore: true,
-        minMatchCharLength: 3,
-        ignoreLocation: true,
-      };
-
-      fuseInstance = new Fuse(versiculos, options);
+    function initializeSearch(payload: SearchIndexPayload) {
+      const parsedIndex = Fuse.parseIndex<VersiculoIndexado>(payload.index);
+      fuseInstance = new Fuse(payload.docs, payload.options, parsedIndex);
+      searchReady = true;
     }
 
-    // Buscar
     function buscar(query: string): VersiculoIndexado[] {
-      if (!fuseInstance || !query || query.trim().length < 2) {
+      if (!searchReady || !fuseInstance || !query || query.trim().length < 2) {
         return [];
       }
 
@@ -147,7 +112,15 @@ import Layout from "../layouts/Layout.astro";
       return resultados.map((r) => r.item);
     }
 
-    // Mostrar resultados
+    function slugifyBookName(name: string): string {
+      return name
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .toLowerCase();
+    }
+
     function displayResults(query: string, resultados: VersiculoIndexado[]) {
       const loading = document.getElementById("loading");
       const results = document.getElementById("results");
@@ -189,26 +162,26 @@ import Layout from "../layouts/Layout.astro";
           <header class="mb-4">
             <h3 class="text-xl font-bold text-blue-700 dark:text-blue-400">
               <a 
-                href="/libro/${encodeURIComponent(resultado.libro)}/${resultado.capitulo}#v${resultado.versiculo}"
+                href="/libro/${slugifyBookName(resultado.libro)}/${resultado.capitulo}#v${resultado.versiculo}"
                 class="hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
               >
                 ${resultado.libro} ${resultado.capitulo}:${resultado.versiculo}
               </a>
             </h3>
           </header>
-          
+
           <p class="text-lg text-gray-800 dark:text-gray-200 mb-4 leading-relaxed">
             ${resultado.texto}
           </p>
 
           <div class="flex gap-4">
             <a
-              href="/libro/${encodeURIComponent(resultado.libro)}/${resultado.capitulo}"
+              href="/libro/${slugifyBookName(resultado.libro)}/${resultado.capitulo}"
               class="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 focus:ring-4 focus:ring-blue-300 transition-colors font-semibold"
-              aria-label="Ver capítulo ${resultado.capitulo} completo de ${resultado.libro}"
+              aria-label="Ver capitulo ${resultado.capitulo} completo de ${resultado.libro}"
             >
-              <span class="text-xl" aria-hidden="true">📖</span>
-              Ver capítulo completo
+              <span class="text-xl" aria-hidden="true">&#128214;</span>
+              Ver capitulo completo
             </a>
           </div>
         </article>
@@ -218,50 +191,42 @@ import Layout from "../layouts/Layout.astro";
       }
     }
 
-    // Manejar formulario
-    document
-      .getElementById("searchForm")
-      ?.addEventListener("submit", async (e) => {
-        e.preventDefault();
+    document.getElementById("searchForm")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-        const searchInput = document.getElementById(
-          "searchInput",
-        ) as HTMLInputElement | null;
-        const query = searchInput?.value.trim() ?? "";
-        if (!query) return;
+      const searchInput = document.getElementById("searchInput") as HTMLInputElement | null;
+      const query = searchInput?.value.trim() ?? "";
+      if (!query) return;
 
-        const loading = document.getElementById("loading");
-        const results = document.getElementById("results");
-        const noResults = document.getElementById("noResults");
-        const initialMessage = document.getElementById("initialMessage");
+      const loading = document.getElementById("loading");
+      const results = document.getElementById("results");
+      const noResults = document.getElementById("noResults");
+      const initialMessage = document.getElementById("initialMessage");
 
-        loading?.classList.remove("hidden");
-        results?.classList.add("hidden");
-        noResults?.classList.add("hidden");
-        initialMessage?.classList.add("hidden");
+      loading?.classList.remove("hidden");
+      results?.classList.add("hidden");
+      noResults?.classList.add("hidden");
+      initialMessage?.classList.add("hidden");
 
-        try {
-          if (!bibliaData) {
-            bibliaData = await loadBible();
-            initializeSearch(bibliaData);
-          }
-
-          const resultados = buscar(query);
-          displayResults(query, resultados);
-        } catch (error) {
-          console.error("Error en búsqueda:", error);
-          loading?.classList.add("hidden");
-          alert("Error al buscar. Por favor intenta de nuevo.");
+      try {
+        if (!searchReady) {
+          const payload = await loadPrecomputedSearchIndex();
+          initializeSearch(payload);
         }
-      });
 
-    // Verificar si hay query en URL
+        const resultados = buscar(query);
+        displayResults(query, resultados);
+      } catch (error) {
+        console.error("Error en busqueda:", error);
+        loading?.classList.add("hidden");
+        alert("Error al buscar. Por favor intenta de nuevo.");
+      }
+    });
+
     const urlParams = new URLSearchParams(window.location.search);
     const queryParam = urlParams.get("q");
     if (queryParam) {
-      const searchInput = document.getElementById(
-        "searchInput",
-      ) as HTMLInputElement | null;
+      const searchInput = document.getElementById("searchInput") as HTMLInputElement | null;
       if (searchInput) searchInput.value = queryParam;
       document.getElementById("searchForm")?.dispatchEvent(new Event("submit"));
     }

@@ -1,14 +1,50 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @variant dark (&:where(.dark, .dark *));
 
-/* Focus visible fuerte para accesibilidad */
+:root {
+  --brand-ink: #0f172a;
+  --brand-surface: #f8fafc;
+  --brand-accent: #1d4ed8;
+  --brand-warm: #f59e0b;
+}
+
+html,
+body {
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  color: var(--brand-ink);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Fraunces", Georgia, serif;
+  letter-spacing: -0.01em;
+}
+
+body {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  background:
+    radial-gradient(circle at 14% -8%, rgba(37, 99, 235, 0.1), transparent 35%),
+    radial-gradient(circle at 85% 0%, rgba(245, 158, 11, 0.08), transparent 28%),
+    var(--brand-surface);
+}
+
+.dark body {
+  background:
+    radial-gradient(circle at 12% -10%, rgba(59, 130, 246, 0.12), transparent 34%),
+    radial-gradient(circle at 90% 0%, rgba(245, 158, 11, 0.09), transparent 30%),
+    #0b1220;
+}
+
 *:focus-visible {
   outline: 3px solid #2563eb;
   outline-offset: 2px;
 }
 
-/* Botones grandes para adultos mayores */
 .btn-large {
   min-height: 60px;
   font-size: 1.25rem;
@@ -16,13 +52,15 @@
   font-weight: 600;
 }
 
-/* Texto grande por defecto */
-body {
-  font-size: 1.125rem;
-  line-height: 1.7;
+p,
+li {
+  max-width: 70ch;
 }
 
-/* Alto contraste opcional */
+.spacing-wide > * + * {
+  margin-top: 1.5rem;
+}
+
 @media (prefers-contrast: high) {
   body {
     background: #fff;
@@ -30,7 +68,6 @@ body {
   }
 }
 
-/* Reducción de movimiento */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -40,14 +77,4 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
-
-/* Mejorar legibilidad */
-p, li {
-  max-width: 70ch;
-}
-
-/* Espaciado amplio */
-.spacing-wide > * + * {
-  margin-top: 1.5rem;
 }

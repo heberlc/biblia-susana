@@ -1,5 +1,4 @@
 ---
-// Componente de botón para leer texto en voz alta
 interface Props {
   text: string;
   label?: string;
@@ -18,7 +17,7 @@ const uniqueId = `speech-${Date.now()}-${Math.random().toString(36).substring(2,
     data-speech-id={uniqueId}
     aria-label={`${label}: ${text.substring(0, 50)}...`}
   >
-    <span class="text-2xl" aria-hidden="true">🔊</span>
+    <span class="text-2xl" aria-hidden="true">&#128266;</span>
     <span>{label}</span>
   </button>
 
@@ -28,25 +27,23 @@ const uniqueId = `speech-${Date.now()}-${Math.random().toString(36).substring(2,
     data-speech-id={uniqueId}
     aria-label="Detener audio"
   >
-    <span class="text-2xl" aria-hidden="true">⏹️</span>
+    <span class="text-2xl" aria-hidden="true">&#9209;</span>
     <span>Detener</span>
   </button>
 </div>
 
 <script>
-  import {
-    speechRead,
-    speechStop,
-    initSpeech,
-    isSpeaking,
-  } from "../lib/speech";
+  import { speechRead, speechStop, initSpeech, isSpeaking } from "../lib/speech";
 
-  // Inicializar Web Speech API
-  initSpeech();
+  type WindowWithSpeechState = Window & {
+    __bibliaSpeechDelegated?: boolean;
+    __bibliaSpeechActiveId?: string | null;
+  };
 
-  let currentActiveSpeechId: string | null = null;
+  function getWin(): WindowWithSpeechState {
+    return window as WindowWithSpeechState;
+  }
 
-  // Función para actualizar el estado de los botones
   function updateButtons(activeSpeechId: string | null) {
     const speaking = isSpeaking();
     const allStopButtons = document.querySelectorAll(".btn-stop-speech");
@@ -63,15 +60,10 @@ const uniqueId = `speech-${Date.now()}-${Math.random().toString(36).substring(2,
     });
   }
 
-  // Función para resetear los botones del capítulo
   function resetChapterButtons() {
-    // Detener cualquier reproducción de capítulo
     speechStop();
 
-    // Buscar todos los botones de capítulo y resetear su estado
-    const chapterControls = document.querySelectorAll(
-      '[id^="controls-chapter-"]',
-    );
+    const chapterControls = document.querySelectorAll('[id^="controls-chapter-"]');
     chapterControls.forEach((container) => {
       const playBtn = container.querySelector(".btn-play-chapter");
       const pauseBtn = container.querySelector(".btn-pause-chapter");
@@ -84,53 +76,52 @@ const uniqueId = `speech-${Date.now()}-${Math.random().toString(36).substring(2,
       stopBtn?.classList.add("hidden");
     });
 
-    // Disparar evento personalizado para que ChapterSpeechButton se resetee
     window.dispatchEvent(new CustomEvent("verse-speech-started"));
   }
 
-  // Agregar listeners a todos los botones de speech
-  function initSpeechButtons() {
-    const buttons = document.querySelectorAll(".btn-speech");
-    const stopButtons = document.querySelectorAll(".btn-stop-speech");
+  function initDelegatedSpeechButtons() {
+    const win = getWin();
+    if (win.__bibliaSpeechDelegated) return;
 
-    buttons.forEach((button) => {
-      button.addEventListener("click", (e) => {
-        const target = e.currentTarget as HTMLButtonElement;
-        const text = target.dataset.text || target.getAttribute("data-text");
-        const speechId = target.getAttribute("data-speech-id");
+    initSpeech();
+    win.__bibliaSpeechDelegated = true;
+    win.__bibliaSpeechActiveId = null;
 
-        if (text && speechId) {
-          // Resetear controles del capítulo antes de leer el verso
-          resetChapterButtons();
+    document.addEventListener("click", (event) => {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
 
-          // Cancelar speech previo y hablar directamente (sin setTimeout)
-          window.speechSynthesis?.cancel();
-          currentActiveSpeechId = speechId;
-
-          // Llamar speechRead con callback onEnd para limpiar botones
-          speechRead(text, () => {
-            currentActiveSpeechId = null;
-            updateButtons(null);
-          });
-
-          // Actualizar botones inmediatamente
-          updateButtons(currentActiveSpeechId);
-        }
-      });
-    });
-
-    stopButtons.forEach((button) => {
-      button.addEventListener("click", () => {
+      const stopButton = target.closest(".btn-stop-speech") as HTMLButtonElement | null;
+      if (stopButton) {
         speechStop();
-        currentActiveSpeechId = null;
+        win.__bibliaSpeechActiveId = null;
+        updateButtons(null);
+        return;
+      }
+
+      const playButton = target.closest(".btn-speech") as HTMLButtonElement | null;
+      if (!playButton) return;
+
+      const text = playButton.dataset.text || playButton.getAttribute("data-text");
+      const speechId = playButton.getAttribute("data-speech-id");
+      if (!text || !speechId) return;
+
+      resetChapterButtons();
+      window.speechSynthesis?.cancel();
+      win.__bibliaSpeechActiveId = speechId;
+
+      speechRead(text, () => {
+        win.__bibliaSpeechActiveId = null;
         updateButtons(null);
       });
+
+      updateButtons(win.__bibliaSpeechActiveId);
     });
   }
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initSpeechButtons);
+    document.addEventListener("DOMContentLoaded", initDelegatedSpeechButtons);
   } else {
-    initSpeechButtons();
+    initDelegatedSpeechButtons();
   }
 </script>

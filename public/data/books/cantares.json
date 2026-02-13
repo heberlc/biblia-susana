@@ -1,0 +1,583 @@
+{
+  "version": "Reina-Valera 1960",
+  "libro": {
+    "nombre": "Cantares",
+    "capitulos": [
+      {
+        "numero": 1,
+        "versiculos": [
+          {
+            "numero": 1,
+            "texto": "Cantar de los cantares, el cual es de Salomón."
+          },
+          {
+            "numero": 2,
+            "texto": "¡Oh, si él me besara con besos de su boca! Porque mejores son tus amores que el vino."
+          },
+          {
+            "numero": 3,
+            "texto": "A más del olor de tus suaves ungüentos, Por eso las doncellas te aman."
+          },
+          {
+            "numero": 4,
+            "texto": "Atráeme; en pos de ti correremos. Con razón te aman.",
+            "titulo": "Tu nombre es como ungüento derramado;"
+          },
+          {
+            "numero": 5,
+            "texto": "Morena soy, oh hijas de Jerusalén, pero codiciable Como las cortinas de Salomón.",
+            "titulo": "Nos acordaremos de tus amores más que del vino;"
+          },
+          {
+            "numero": 6,
+            "texto": "No reparéis en que soy morena, Porque el sol me miró. Y mi viña, que era mía, no guardé.",
+            "titulo": "Como las tiendas de Cedar,"
+          },
+          {
+            "numero": 7,
+            "texto": "Hazme saber, oh tú a quien ama mi alma,",
+            "titulo": "Me pusieron a guardar las viñas;"
+          },
+          {
+            "numero": 8,
+            "texto": "Si tú no lo sabes, oh hermosa entre las mujeres, Y apacienta tus cabritas junto a las cabañas de los pastores.",
+            "titulo": "Junto a los rebaños de tus compañeros?"
+          },
+          {
+            "numero": 9,
+            "texto": "A yegua de los carros de Faraón Te he comparado, amiga mía.",
+            "titulo": "La esposa y el esposo"
+          },
+          {
+            "numero": 10,
+            "texto": "Hermosas son tus mejillas entre los pendientes, Tu cuello entre los collares."
+          },
+          {
+            "numero": 11,
+            "texto": "Zarcillos de oro te haremos, Tachonados de plata."
+          },
+          {
+            "numero": 12,
+            "texto": "Mientras el rey estaba en su reclinatorio, Mi nardo dio su olor."
+          },
+          {
+            "numero": 13,
+            "texto": "Mi amado es para mí un manojito de mirra, Que reposa entre mis pechos."
+          },
+          {
+            "numero": 14,
+            "texto": "Racimo de flores de alheña en las viñas de En-gadi Es para mí mi amado."
+          },
+          {
+            "numero": 15,
+            "texto": "He aquí que tú eres hermosa, amiga mía; He aquí eres bella; tus ojos son como palomas."
+          },
+          {
+            "numero": 16,
+            "texto": "He aquí que tú eres hermoso, amado mío, y dulce; Nuestro lecho es de flores."
+          },
+          {
+            "numero": 17,
+            "texto": "Las vigas de nuestra casa son de cedro, Y de ciprés los artesonados."
+          }
+        ]
+      },
+      {
+        "numero": 2,
+        "versiculos": [
+          {
+            "numero": 1,
+            "texto": "Yo soy la rosa de Sarón, Y el lirio de los valles."
+          },
+          {
+            "numero": 2,
+            "texto": "Como el lirio entre los espinos, Así es mi amiga entre las doncellas."
+          },
+          {
+            "numero": 3,
+            "texto": "Como el manzano entre los árboles silvestres, Y su fruto fue dulce a mi paladar."
+          },
+          {
+            "numero": 4,
+            "texto": "Me llevó a la casa del banquete, Y su bandera sobre mí fue amor.",
+            "titulo": "Bajo la sombra del deseado me senté,"
+          },
+          {
+            "numero": 5,
+            "texto": "Sustentadme con pasas, confortadme con manzanas; Porque estoy enferma de amor."
+          },
+          {
+            "numero": 6,
+            "texto": "Su izquierda esté debajo de mi cabeza, Y su derecha me abrace."
+          },
+          {
+            "numero": 7,
+            "texto": "Yo os conjuro, oh doncellas de Jerusalén, Hasta que quiera."
+          },
+          {
+            "numero": 8,
+            "texto": "¡La voz de mi amado! He aquí él viene Brincando sobre los collados.",
+            "titulo": "Que no despertéis ni hagáis velar al amor,"
+          },
+          {
+            "numero": 9,
+            "texto": "Mi amado es semejante al corzo, O al cervatillo. Atisbando por las celosías.",
+            "titulo": "Saltando sobre los montes,"
+          },
+          {
+            "numero": 10,
+            "texto": "Mi amado habló, y me dijo: Levántate, oh amiga mía, hermosa mía, y ven.",
+            "titulo": "Mirando por las ventanas,"
+          },
+          {
+            "numero": 11,
+            "texto": "Porque he aquí ha pasado el invierno,"
+          },
+          {
+            "numero": 12,
+            "texto": "Se han mostrado las flores en la tierra, Y en nuestro país se ha oído la voz de la tórtola.",
+            "titulo": "Se ha mudado, la lluvia se fue;"
+          },
+          {
+            "numero": 13,
+            "texto": "La higuera ha echado sus higos, Levántate, oh amiga mía, hermosa mía, y ven.",
+            "titulo": "El tiempo de la canción ha venido,"
+          },
+          {
+            "numero": 14,
+            "texto": "Paloma mía, que estás en los agujeros de la peña, en lo escondido de escarpados parajes, Porque dulce es la voz tuya, y hermoso tu aspecto.",
+            "titulo": "Y las vides en cierne dieron olor;"
+          },
+          {
+            "numero": 15,
+            "texto": "Cazadnos las zorras, las zorras pequeñas, que echan a perder las viñas; Porque nuestras viñas están en cierne.",
+            "titulo": "Muéstrame tu rostro, hazme oír tu voz;"
+          },
+          {
+            "numero": 16,
+            "texto": "Mi amado es mío, y yo suya; El apacienta entre lirios."
+          },
+          {
+            "numero": 17,
+            "texto": "Hasta que apunte el día, y huyan las sombras, Sobre los montes de Beter."
+          }
+        ]
+      },
+      {
+        "numero": 3,
+        "versiculos": [
+          {
+            "numero": 1,
+            "texto": "Por las noches busqué en mi lecho al que ama mi alma; Lo busqué, y no lo hallé."
+          },
+          {
+            "numero": 2,
+            "texto": "Y dije: Me levantaré ahora, y rodearé por la ciudad; Lo busqué, y no lo hallé."
+          },
+          {
+            "numero": 3,
+            "texto": "Me hallaron los guardas que rondan la ciudad, Y les dije: ¿Habéis visto al que ama mi alma?",
+            "titulo": "Buscaré al que ama mi alma;"
+          },
+          {
+            "numero": 4,
+            "texto": "Apenas hube pasado de ellos un poco, Y en la cámara de la que me dio a luz."
+          },
+          {
+            "numero": 5,
+            "texto": "Yo os conjuro, oh doncellas de Jerusalén, Hasta que quiera.",
+            "titulo": "Hasta que lo metí en casa de mi madre,"
+          },
+          {
+            "numero": 6,
+            "texto": "¿Quién es ésta que sube del desierto como columna de humo,",
+            "titulo": "El cortejo de bodas"
+          },
+          {
+            "numero": 7,
+            "texto": "He aquí es la litera de Salomón; De los fuertes de Israel.",
+            "titulo": "Y de todo polvo aromático?"
+          },
+          {
+            "numero": 8,
+            "texto": "Todos ellos tienen espadas, diestros en la guerra; Por los temores de la noche.",
+            "titulo": "Sesenta valientes la rodean,"
+          },
+          {
+            "numero": 9,
+            "texto": "El rey Salomón se hizo una carroza De madera del Líbano.",
+            "titulo": "Cada uno su espada sobre su muslo,"
+          },
+          {
+            "numero": 10,
+            "texto": "Hizo sus columnas de plata, Por las doncellas de Jerusalén."
+          },
+          {
+            "numero": 11,
+            "texto": "Salid, oh doncellas de Sion, y ved al rey Salomón Con la corona con que le coronó su madre en el día de su desposorio, Y el día del gozo de su corazón.",
+            "titulo": "Su interior recamado de amor"
+          }
+        ]
+      },
+      {
+        "numero": 4,
+        "versiculos": [
+          {
+            "numero": 1,
+            "texto": "He aquí que tú eres hermosa, amiga mía; he aquí que tú eres hermosa; Que se recuestan en las laderas de Galaad."
+          },
+          {
+            "numero": 2,
+            "texto": "Tus dientes como manadas de ovejas trasquiladas, Y ninguna entre ellas estéril.",
+            "titulo": "Tus cabellos como manada de cabras"
+          },
+          {
+            "numero": 3,
+            "texto": "Tus labios como hilo de grana, Tus mejillas, como cachos de granada detrás de tu velo.",
+            "titulo": "Todas con crías gemelas,"
+          },
+          {
+            "numero": 4,
+            "texto": "Tu cuello, como la torre de David, edificada para armería; Todos escudos de valientes.",
+            "titulo": "Y tu habla hermosa;"
+          },
+          {
+            "numero": 5,
+            "texto": "Tus dos pechos, como gemelos de gacela, Que se apacientan entre lirios.",
+            "titulo": "Mil escudos están colgados en ella,"
+          },
+          {
+            "numero": 6,
+            "texto": "Hasta que apunte el día y huyan las sombras, Y al collado del incienso."
+          },
+          {
+            "numero": 7,
+            "texto": "Toda tú eres hermosa, amiga mía, Y en ti no hay mancha.",
+            "titulo": "Me iré al monte de la mirra,"
+          },
+          {
+            "numero": 8,
+            "texto": "Ven conmigo desde el Líbano, oh esposa mía; Ven conmigo desde el Líbano. Desde los montes de los leopardos."
+          },
+          {
+            "numero": 9,
+            "texto": "Prendiste mi corazón, hermana, esposa mía; Con una gargantilla de tu cuello.",
+            "titulo": "Desde las guaridas de los leones,"
+          },
+          {
+            "numero": 10,
+            "texto": "¡Cuán hermosos son tus amores, hermana, esposa mía! ¡Cuánto mejores que el vino tus amores,",
+            "titulo": "Has apresado mi corazón con uno de tus ojos,"
+          },
+          {
+            "numero": 11,
+            "texto": "Como panal de miel destilan tus labios, oh esposa; Y el olor de tus vestidos como el olor del Líbano.",
+            "titulo": "Y el olor de tus ungüentos que todas las especias aromáticas!"
+          },
+          {
+            "numero": 12,
+            "texto": "Huerto cerrado eres, hermana mía, esposa mía; Fuente cerrada, fuente sellada.",
+            "titulo": "Miel y leche hay debajo de tu lengua;"
+          },
+          {
+            "numero": 13,
+            "texto": "Tus renuevos son paraíso de granados, con frutos suaves,"
+          },
+          {
+            "numero": 14,
+            "texto": "Nardo y azafrán, caña aromática y canela, Mirra y áloes, con todas las principales especias aromáticas.",
+            "titulo": "De flores de alheña y nardos;"
+          },
+          {
+            "numero": 15,
+            "texto": "Fuente de huertos, Que corren del Líbano.",
+            "titulo": "Con todos los árboles de incienso;"
+          },
+          {
+            "numero": 16,
+            "texto": "Levántate, Aquilón, y ven, Austro; Soplad en mi huerto, despréndanse sus aromas. Y coma de su dulce fruta.",
+            "titulo": "Pozo de aguas vivas,"
+          }
+        ]
+      },
+      {
+        "numero": 5,
+        "versiculos": [
+          {
+            "numero": 1,
+            "texto": "Yo vine a mi huerto, oh hermana, esposa mía; Mi vino y mi leche he bebido. Comed, amigos; bebed en abundancia, oh amados."
+          },
+          {
+            "numero": 2,
+            "texto": "Yo dormía, pero mi corazón velaba. Es la voz de mi amado que llama: Mis cabellos de las gotas de la noche.",
+            "titulo": "El tormento de la separación"
+          },
+          {
+            "numero": 3,
+            "texto": "Me he desnudado de mi ropa; ¿cómo me he de vestir?",
+            "titulo": "Porque mi cabeza está llena de rocío,"
+          },
+          {
+            "numero": 4,
+            "texto": "Mi amado metió su mano por la ventanilla, Y mi corazón se conmovió dentro de mí.",
+            "titulo": "He lavado mis pies; ¿cómo los he de ensuciar?"
+          },
+          {
+            "numero": 5,
+            "texto": "Yo me levanté para abrir a mi amado, Sobre la manecilla del cerrojo."
+          },
+          {
+            "numero": 6,
+            "texto": "Abrí yo a mi amado; Y tras su hablar salió mi alma. Lo llamé, y no me respondió.",
+            "titulo": "Y mis dedos mirra, que corría"
+          },
+          {
+            "numero": 7,
+            "texto": "Me hallaron los guardas que rondan la ciudad; Me quitaron mi manto de encima los guardas de los muros.",
+            "titulo": "Lo busqué, y no lo hallé;"
+          },
+          {
+            "numero": 8,
+            "texto": "Yo os conjuro, oh doncellas de Jerusalén, si halláis a mi amado, Que le hagáis saber que estoy enferma de amor.",
+            "titulo": "Me golpearon, me hirieron;"
+          },
+          {
+            "numero": 9,
+            "texto": "¿Qué es tu amado más que otro amado, ¿Qué es tu amado más que otro amado,",
+            "titulo": "La esposa alaba al esposo"
+          },
+          {
+            "numero": 10,
+            "texto": "Mi amado es blanco y rubio, Señalado entre diez mil.",
+            "titulo": "Que así nos conjuras?"
+          },
+          {
+            "numero": 11,
+            "texto": "Su cabeza como oro finísimo; Sus cabellos crespos, negros como el cuervo."
+          },
+          {
+            "numero": 12,
+            "texto": "Sus ojos, como palomas junto a los arroyos de las aguas, Que se lavan con leche, y a la perfección colocados."
+          },
+          {
+            "numero": 13,
+            "texto": "Sus mejillas, como una era de especias aromáticas, como fragantes flores; Sus labios, como lirios que destilan mirra fragante."
+          },
+          {
+            "numero": 14,
+            "texto": "Sus manos, como anillos de oro engastados de jacintos; Su cuerpo, como claro marfil cubierto de zafiros."
+          },
+          {
+            "numero": 15,
+            "texto": "Sus piernas, como columnas de mármol fundadas sobre basas de oro fino; Su aspecto como el Líbano, escogido como los cedros."
+          },
+          {
+            "numero": 16,
+            "texto": "Su paladar, dulcísimo, y todo él codiciable. Oh doncellas de Jerusalén."
+          }
+        ]
+      },
+      {
+        "numero": 6,
+        "versiculos": [
+          {
+            "numero": 1,
+            "texto": "¿A dónde se ha ido tu amado, oh la más hermosa de todas las mujeres? ¿A dónde se apartó tu amado,"
+          },
+          {
+            "numero": 2,
+            "texto": "Mi amado descendió a su huerto, a las eras de las especias, Para apacentar en los huertos, y para recoger los lirios.",
+            "titulo": "Y lo buscaremos contigo?"
+          },
+          {
+            "numero": 3,
+            "texto": "Yo soy de mi amado, y mi amado es mío; El apacienta entre los lirios."
+          },
+          {
+            "numero": 4,
+            "texto": "Hermosa eres tú, oh amiga mía, como Tirsa; Imponente como ejércitos en orden."
+          },
+          {
+            "numero": 5,
+            "texto": "Aparta tus ojos de delante de mí, Porque ellos me vencieron. Que se recuestan en las laderas de Galaad.",
+            "titulo": "De desear, como Jerusalén;"
+          },
+          {
+            "numero": 6,
+            "texto": "Tus dientes, como manadas de ovejas que suben del lavadero, Y estéril no hay entre ellas.",
+            "titulo": "Tu cabello es como manada de cabras"
+          },
+          {
+            "numero": 7,
+            "texto": "Como cachos de granada son tus mejillas Detrás de tu velo.",
+            "titulo": "Todas con crías gemelas,"
+          },
+          {
+            "numero": 8,
+            "texto": "Sesenta son las reinas, y ochenta las concubinas,"
+          },
+          {
+            "numero": 9,
+            "texto": "Mas una es la paloma mía, la perfecta mía; La escogida de la que la dio a luz. Las reinas y las concubinas, y la alabaron.",
+            "titulo": "Y las doncellas sin número;"
+          },
+          {
+            "numero": 10,
+            "texto": "¿Quién es ésta que se muestra como el alba,",
+            "titulo": "La vieron las doncellas, y la llamaron bienaventurada;"
+          },
+          {
+            "numero": 11,
+            "texto": "Al huerto de los nogales descendí Si florecían los granados.",
+            "titulo": "Imponente como ejércitos en orden?"
+          },
+          {
+            "numero": 12,
+            "texto": "Antes que lo supiera, mi alma me puso Entre los carros de Aminadab.",
+            "titulo": "Y para ver si brotaban las vides,"
+          },
+          {
+            "numero": 13,
+            "texto": "Vuélvete, vuélvete, oh sulamita; Vuélvete, vuélvete, y te miraremos. ¿Qué veréis en la sulamita? Algo como la reunión de dos campamentos."
+          }
+        ]
+      },
+      {
+        "numero": 7,
+        "versiculos": [
+          {
+            "numero": 1,
+            "texto": "¡Cuán hermosos son tus pies en las sandalias, Obra de mano de excelente maestro."
+          },
+          {
+            "numero": 2,
+            "texto": "Tu ombligo como una taza redonda Que no le falta bebida. Cercado de lirios.",
+            "titulo": "Los contornos de tus muslos son como joyas,"
+          },
+          {
+            "numero": 3,
+            "texto": "Tus dos pechos, como gemelos de gacela.",
+            "titulo": "Tu vientre como montón de trigo"
+          },
+          {
+            "numero": 4,
+            "texto": "Tu cuello, como torre de marfil; Tus ojos, como los estanques de Hesbón junto a la puerta de Bat-rabim; Que mira hacia Damasco."
+          },
+          {
+            "numero": 5,
+            "texto": "Tu cabeza encima de ti, como el Carmelo; Suspendida en los corredores.",
+            "titulo": "Tu nariz, como la torre del Líbano,"
+          },
+          {
+            "numero": 6,
+            "texto": "¡Qué hermosa eres, y cuán suave,",
+            "titulo": "Y el cabello de tu cabeza, como la púrpura del rey"
+          },
+          {
+            "numero": 7,
+            "texto": "Tu estatura es semejante a la palmera, Y tus pechos a los racimos.",
+            "titulo": "Oh amor deleitoso!"
+          },
+          {
+            "numero": 8,
+            "texto": "Yo dije: Subiré a la palmera, Asiré sus ramas."
+          },
+          {
+            "numero": 9,
+            "texto": "Y tu paladar como el buen vino, Y hace hablar los labios de los viejos.",
+            "titulo": "Y el olor de tu boca como de manzanas,"
+          },
+          {
+            "numero": 10,
+            "texto": "Yo soy de mi amado, Y conmigo tiene su contentamiento.",
+            "titulo": "Que se entra a mi amado suavemente,"
+          },
+          {
+            "numero": 11,
+            "texto": "Ven, oh amado mío, salgamos al campo, Moremos en las aldeas."
+          },
+          {
+            "numero": 12,
+            "texto": "Levantémonos de mañana a las viñas; Allí te daré mis amores."
+          },
+          {
+            "numero": 13,
+            "texto": "Las mandrágoras han dado olor, Nuevas y añejas, que para ti, oh amado mío, he guardado.",
+            "titulo": "Si han florecido los granados;"
+          }
+        ]
+      },
+      {
+        "numero": 8,
+        "versiculos": [
+          {
+            "numero": 1,
+            "texto": "¡Oh, si tú fueras como un hermano mío Y no me menospreciarían."
+          },
+          {
+            "numero": 2,
+            "texto": "Yo te llevaría, te metería en casa de mi madre; Adobado del mosto de mis granadas.",
+            "titulo": "Entonces, hallándote fuera, te besaría,"
+          },
+          {
+            "numero": 3,
+            "texto": "Su izquierda esté debajo de mi cabeza, Y su derecha me abrace.",
+            "titulo": "Y yo te haría beber vino"
+          },
+          {
+            "numero": 4,
+            "texto": "Os conjuro, oh doncellas de Jerusalén, Hasta que quiera."
+          },
+          {
+            "numero": 5,
+            "texto": "¿Quién es ésta que sube del desierto, Allí tuvo dolores la que te dio a luz.",
+            "titulo": "El poder del amor"
+          },
+          {
+            "numero": 6,
+            "texto": "Ponme como un sello sobre tu corazón, como una marca sobre tu brazo; Sus brasas, brasas de fuego, fuerte llama.",
+            "titulo": "Allí tuvo tu madre dolores,"
+          },
+          {
+            "numero": 7,
+            "texto": "Las muchas aguas no podrán apagar el amor, Ni lo ahogarán los ríos. Si diese el hombre todos los bienes de su casa por este amor, De cierto lo menospreciarían.",
+            "titulo": "Duros como el Seol los celos;"
+          },
+          {
+            "numero": 8,
+            "texto": "Tenemos una pequeña hermana, ¿Qué haremos a nuestra hermana"
+          },
+          {
+            "numero": 9,
+            "texto": "Si ella es muro, La guarneceremos con tablas de cedro.",
+            "titulo": "Cuando de ella se hablare?"
+          },
+          {
+            "numero": 10,
+            "texto": "Yo soy muro, y mis pechos como torres, Desde que fui en sus ojos como la que halla paz.",
+            "titulo": "Si fuere puerta,"
+          },
+          {
+            "numero": 11,
+            "texto": "Salomón tuvo una viña en Baal-hamón, Cada uno de los cuales debía traer mil monedas de plata por su fruto."
+          },
+          {
+            "numero": 12,
+            "texto": "Mi viña, que es mía, está delante de mí; Y doscientas para los que guardan su fruto.",
+            "titulo": "La cual entregó a guardas,"
+          },
+          {
+            "numero": 13,
+            "texto": "Oh, tú que habitas en los huertos, Házmela oír.",
+            "titulo": "Las mil serán tuyas, oh Salomón,"
+          },
+          {
+            "numero": 14,
+            "texto": "Apresúrate, amado mío, Sobre las montañas de los aromas. ISAÍAS",
+            "titulo": "Los compañeros escuchan tu voz;"
+          }
+        ]
+      }
+    ]
+  }
+}

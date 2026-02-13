@@ -72,7 +72,7 @@ const canonicalURL = new URL(
     </script>
   </head>
   <body
-    class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col transition-colors duration-300"
+    class="min-h-screen text-gray-900 dark:text-gray-100 flex flex-col transition-colors duration-300"
   >
     <!-- Skip link para accesibilidad -->
     <a
@@ -83,19 +83,19 @@ const canonicalURL = new URL(
     </a>
 
     <header
-      class="sticky top-0 z-50 bg-blue-700 dark:bg-blue-900 text-white shadow-lg transition-colors duration-300"
+      class="sticky top-0 z-50 bg-linear-to-r from-blue-700 to-blue-800 dark:from-slate-900 dark:to-blue-950 text-white shadow-lg transition-colors duration-300 border-b border-blue-400/30 dark:border-blue-900/70 backdrop-blur"
     >
-      <div class="container mx-auto px-4 py-6">
-        <nav class="flex justify-between items-center">
+      <div class="container mx-auto px-4 py-3 sm:py-6">
+        <nav class="flex flex-wrap items-center gap-3">
           <a
             href="/"
-            class="inline-flex items-center gap-2 hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-blue-300 rounded-lg px-2 py-1"
+            class="inline-flex min-w-0 flex-1 items-center gap-2 hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-blue-300 rounded-lg px-2 py-1"
           >
-            <span class="text-2xl" aria-hidden="true">📖</span>
-            <h1 class="text-2xl sm:text-3xl font-bold">Biblia Susana</h1>
+            <span class="text-[22px] sm:text-2xl" aria-hidden="true">📖</span>
+            <h1 class="truncate text-[24px] sm:text-3xl font-bold">Biblia Susana</h1>
           </a>
 
-          <div class="flex items-center gap-2">
+          <div class="ml-auto flex w-full sm:w-auto items-center justify-end gap-2">
             <!-- Control de tamaño de fuente -->
             <div
               class="flex items-center gap-1"
@@ -105,13 +105,13 @@ const canonicalURL = new URL(
               <button
                 id="font-decrease"
                 type="button"
-                class="px-3 py-2 bg-blue-600 dark:bg-blue-800 hover:bg-blue-500 dark:hover:bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-300 transition-colors font-bold text-sm"
+                class="px-[10px] py-[8px] bg-blue-600 dark:bg-blue-800 hover:bg-blue-500 dark:hover:bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-300 transition-colors font-bold text-[15px] leading-none"
                 aria-label="Reducir tamaño de texto">A-</button
               >
               <button
                 id="font-increase"
                 type="button"
-                class="px-3 py-2 bg-blue-600 dark:bg-blue-800 hover:bg-blue-500 dark:hover:bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-300 transition-colors font-bold text-lg"
+                class="px-[10px] py-[8px] bg-blue-600 dark:bg-blue-800 hover:bg-blue-500 dark:hover:bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-300 transition-colors font-bold text-[20px] leading-none"
                 aria-label="Aumentar tamaño de texto">A+</button
               >
             </div>
@@ -120,10 +120,10 @@ const canonicalURL = new URL(
             <button
               id="theme-toggle"
               type="button"
-              class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 dark:bg-blue-800 hover:bg-blue-500 dark:hover:bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-300 transition-colors font-semibold"
+              class="inline-flex items-center gap-2 px-[12px] py-[8px] bg-blue-600 dark:bg-blue-800 hover:bg-blue-500 dark:hover:bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-300 transition-colors font-semibold text-[15px] leading-none"
               aria-label="Cambiar modo de color"
             >
-              <span id="theme-icon" class="text-2xl"></span>
+              <span id="theme-icon" class="text-[20px]"></span>
               <span id="theme-text" class="hidden sm:inline"></span>
             </button>
           </div>
@@ -136,9 +136,9 @@ const canonicalURL = new URL(
     </main>
 
     <footer
-      class="bg-gray-800 dark:bg-gray-950 text-white mt-12 transition-colors duration-300"
+      class="bg-linear-to-r from-slate-800 to-slate-900 dark:from-slate-950 dark:to-black text-white mt-12 transition-colors duration-300"
     >
-      <div class="container mx-auto px-4 py-6">
+      <div class="container mx-auto px-4 py-3 sm:py-6">
         <div class="flex flex-col items-center justify-center w-full">
           <p class="text-lg max-w-none">
             &copy; {new Date().getFullYear()} Biblia Susana
@@ -242,3 +242,4 @@ const canonicalURL = new URL(
     </script>
   </body>
 </html>
+

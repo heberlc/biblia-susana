@@ -2,43 +2,76 @@
 import Layout from "../../layouts/Layout.astro";
 import Breadcrumbs from "../../components/Breadcrumbs.astro";
 import { loadBible } from "../../lib/loadBible";
+import { slugifyBookName } from "../../lib/bookSlug";
 import type { Libro } from "../../types/bible";
 
-// Generar rutas estáticas para todos los libros
-export async function getStaticPaths() {
-  const biblia = await loadBible();
-  
-  return biblia.libros.map((libro) => ({
-    params: { nombre: libro.nombre },
-  }));
+function normalizeBookName(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
 }
 
-// Obtener el nombre del libro de la URL
+export async function getStaticPaths() {
+  const biblia = await loadBible();
+  const seen = new Set<string>();
+  const paths: { params: { nombre: string } }[] = [];
+
+  for (const libro of biblia.libros) {
+    const slug = slugifyBookName(libro.nombre);
+    const candidates = [slug, libro.nombre];
+
+    for (const candidate of candidates) {
+      if (!candidate || seen.has(candidate)) continue;
+      seen.add(candidate);
+      paths.push({ params: { nombre: candidate } });
+    }
+  }
+
+  return paths;
+}
+
 const { nombre } = Astro.params;
+const rawNombre = nombre ?? "";
+const decodedNombre = decodeURIComponent(rawNombre);
+const normalizedParam = normalizeBookName(decodedNombre);
 
 let libro: Libro | undefined;
 let error = false;
 
 try {
   const biblia = await loadBible();
-  libro = biblia.libros.find(l => l.nombre === nombre);
+  libro = biblia.libros.find((l) => {
+    const normalizedLibro = normalizeBookName(l.nombre);
+    const libroSlug = slugifyBookName(l.nombre);
+
+    return (
+      libroSlug === rawNombre ||
+      libroSlug === decodedNombre ||
+      l.nombre === rawNombre ||
+      l.nombre === decodedNombre ||
+      normalizedLibro === normalizedParam
+    );
+  });
 } catch (e) {
-  console.error('Error al cargar el libro:', e);
+  console.error("Error al cargar el libro:", e);
   error = true;
 }
 
-// Si no se encuentra el libro, mostrar error
 if (!libro && !error) {
-  return Astro.redirect('/404');
+  return Astro.redirect("/404");
 }
+
+const libroSlug = libro ? slugifyBookName(libro.nombre) : "";
 ---
 
 <Layout
-  title={`${libro?.nombre || 'Libro'} - Biblia Susana`}
-  description={`Lee todos los capítulos de ${libro?.nombre || ''} con audio y búsqueda. Biblia Susana`}
+  title={`${libro?.nombre || "Libro"} - Biblia Susana`}
+  description={`Lee todos los capitulos de ${libro?.nombre || ""} con audio y busqueda. Biblia Susana`}
 >
   <div class="max-w-5xl mx-auto">
-    <Breadcrumbs items={[{ label: libro?.nombre || 'Libro' }]} />
+    <Breadcrumbs items={[{ label: libro?.nombre || "Libro" }]} />
 
     {error && (
       <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-6 rounded-lg" role="alert">
@@ -49,29 +82,23 @@ if (!libro && !error) {
 
     {libro && (
       <div>
-        <!-- Encabezado del libro -->
         <header class="mb-8 text-center">
-          <h1 class="text-4xl md:text-5xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-            {libro.nombre}
-          </h1>
+          <h1 class="text-4xl md:text-5xl font-bold text-gray-800 dark:text-gray-100 mb-4">{libro.nombre}</h1>
           <p class="text-xl text-gray-600 dark:text-gray-300">
-            {libro.capitulos.length} {libro.capitulos.length === 1 ? 'capítulo' : 'capítulos'}
+            {libro.capitulos.length} {libro.capitulos.length === 1 ? "capitulo" : "capitulos"}
           </p>
         </header>
 
-        <!-- Lista de capítulos -->
         <section>
-          <h2 class="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">Capítulos</h2>
+          <h2 class="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">Capitulos</h2>
           <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
             {libro.capitulos.map((capitulo) => (
               <a
-                href={`/libro/${encodeURIComponent(libro.nombre)}/${capitulo.numero}`}
+                href={`/libro/${libroSlug}/${capitulo.numero}`}
                 class="flex items-center justify-center bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-xl hover:scale-110 transition-all border-2 border-transparent hover:border-blue-500 dark:hover:border-blue-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-300"
-                aria-label={`Capítulo ${capitulo.numero}`}
+                aria-label={`Capitulo ${capitulo.numero}`}
               >
-                <span class="text-3xl font-bold text-blue-700 dark:text-blue-400">
-                  {capitulo.numero}
-                </span>
+                <span class="text-3xl font-bold text-blue-700 dark:text-blue-400">{capitulo.numero}</span>
               </a>
             ))}
           </div>
@@ -82,7 +109,6 @@ if (!libro && !error) {
 </Layout>
 
 <style>
-  /* Animación para los botones de capítulos */
   @media (prefers-reduced-motion: no-preference) {
     a {
       animation: fadeIn 0.4s ease-out;

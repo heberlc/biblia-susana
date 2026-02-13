@@ -5,30 +5,48 @@ import ChapterSpeechButton from "../../../components/ChapterSpeechButton.astro";
 import Breadcrumbs from "../../../components/Breadcrumbs.astro";
 import ShareButton from "../../../components/ShareButton.astro";
 import { loadBible } from "../../../lib/loadBible";
+import { slugifyBookName } from "../../../lib/bookSlug";
 import type { Libro, Capitulo } from "../../../types/bible";
 
-// Generar rutas estáticas para todos los capítulos de todos los libros
+function normalizeBookName(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
 export async function getStaticPaths() {
   const biblia = await loadBible();
-  const paths = [];
-  
+  const paths: { params: { nombre: string; capitulo: string } }[] = [];
+  const seen = new Set<string>();
+
   for (const libro of biblia.libros) {
-    for (const capitulo of libro.capitulos) {
-      paths.push({
-        params: { 
-          nombre: libro.nombre,
-          capitulo: capitulo.numero.toString()
-        },
-      });
+    const bookCandidates = [slugifyBookName(libro.nombre), libro.nombre];
+    for (const bookParam of bookCandidates) {
+      if (!bookParam) continue;
+      for (const capitulo of libro.capitulos) {
+        const key = `${bookParam}::${capitulo.numero}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        paths.push({
+          params: {
+            nombre: bookParam,
+            capitulo: capitulo.numero.toString(),
+          },
+        });
+      }
     }
   }
-  
+
   return paths;
 }
 
-// Obtener parámetros de la URL
 const { nombre, capitulo: capituloNumStr } = Astro.params;
-const capituloNum = parseInt(capituloNumStr || '1', 10);
+const rawNombre = nombre ?? "";
+const decodedNombre = decodeURIComponent(rawNombre);
+const normalizedParam = normalizeBookName(decodedNombre);
+const capituloNum = parseInt(capituloNumStr || "1", 10);
 
 let libro: Libro | undefined;
 let capitulo: Capitulo | undefined;
@@ -36,69 +54,86 @@ let error = false;
 
 try {
   const biblia = await loadBible();
-  libro = biblia.libros.find(l => l.nombre === nombre);
+  libro = biblia.libros.find((l) => {
+    const normalizedLibro = normalizeBookName(l.nombre);
+    const libroSlug = slugifyBookName(l.nombre);
+    return (
+      libroSlug === rawNombre ||
+      libroSlug === decodedNombre ||
+      l.nombre === rawNombre ||
+      l.nombre === decodedNombre ||
+      normalizedLibro === normalizedParam
+    );
+  });
   if (libro) {
-    capitulo = libro.capitulos.find(c => c.numero === capituloNum);
+    capitulo = libro.capitulos.find((c) => c.numero === capituloNum);
   }
 } catch (e) {
-  console.error('Error al cargar el capítulo:', e);
+  console.error("Error al cargar el capitulo:", e);
   error = true;
 }
 
-// Si no se encuentra, redirigir
 if ((!libro || !capitulo) && !error) {
-  return Astro.redirect('/404');
+  return Astro.redirect("/404");
 }
 
-// Capítulos anterior y siguiente para navegación
 const capituloAnterior = libro && capituloNum > 1 ? capituloNum - 1 : null;
 const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capituloNum + 1 : null;
+const libroSlug = libro ? slugifyBookName(libro.nombre) : "";
+
+const totalVerses = capitulo?.versiculos.length ?? 0;
+const lazyThreshold = 80;
+const lazyChunkSize = 24;
+const hasLazyLoad = Boolean(capitulo && totalVerses > lazyThreshold);
+const initialVerseCount = hasLazyLoad ? 40 : totalVerses;
+const versiculosIniciales = capitulo ? capitulo.versiculos.slice(0, initialVerseCount) : [];
+const versiculosRestantes = capitulo ? capitulo.versiculos.slice(initialVerseCount) : [];
+const versiculosRestantesJSON = JSON.stringify(versiculosRestantes);
 ---
 
 <Layout
   title={`${libro?.nombre} ${capituloNum} - Biblia Susana`}
-  description={`${libro?.nombre} capítulo ${capituloNum} - Lee versículo por versículo con audio. Biblia Susana`}
+  description={`${libro?.nombre} capitulo ${capituloNum} - Lee versiculo por versiculo con audio. Biblia Susana`}
 >
   <div class="max-w-4xl mx-auto">
-    <Breadcrumbs items={[
-      { label: libro?.nombre || '', href: `/libro/${encodeURIComponent(nombre || '')}` },
-      { label: `Capítulo ${capituloNum}` }
-    ]} />
+    <Breadcrumbs
+      items={[
+        { label: libro?.nombre || "", href: `/libro/${libroSlug}` },
+        { label: `Capitulo ${capituloNum}` },
+      ]}
+    />
 
     {error && (
       <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-6 rounded-lg" role="alert">
-        <p class="font-bold text-xl mb-2">Error al cargar el capítulo</p>
+        <p class="font-bold text-xl mb-2">Error al cargar el capitulo</p>
         <p class="text-lg">No se pudo cargar el contenido. Intenta de nuevo.</p>
       </div>
     )}
 
     {libro && capitulo && (
       <div>
-        <!-- Encabezado del capítulo -->
-        <header class="mb-8 text-center bg-blue-50 dark:bg-gray-800 rounded-xl p-6 border-2 border-blue-200 dark:border-blue-800">
+        <header class="mb-8 text-center bg-blue-50/80 dark:bg-gray-800 rounded-xl p-6 border-2 border-blue-200 dark:border-blue-800 shadow-md">
           <h1 class="text-4xl md:text-5xl font-bold text-gray-800 dark:text-gray-100 mb-2">
             {libro.nombre} {capituloNum}
           </h1>
           <p class="text-xl text-gray-600 dark:text-gray-300">
-            {capitulo.versiculos.length} {capitulo.versiculos.length === 1 ? 'versículo' : 'versículos'}
+            {capitulo.versiculos.length} {capitulo.versiculos.length === 1 ? "versiculo" : "versiculos"}
           </p>
         </header>
 
-        <!-- Botón para leer todo el capítulo -->
         <div class="mb-8 flex justify-center">
-          <ChapterSpeechButton 
-            versiculos={capitulo.versiculos.map(v => ({ numero: v.numero, texto: v.texto, titulo: v.titulo }))}
-            label="Leer capítulo completo"
+          <ChapterSpeechButton
+            versiculos={capitulo.versiculos.map((v) => ({ numero: v.numero, texto: v.texto, titulo: v.titulo }))}
+            label="Leer capitulo completo"
           />
         </div>
 
-        <!-- Lista de versículos -->
-        <section class="space-y-6 mb-12">
-          <h2 class="sr-only">Versículos</h2>
-          {capitulo.versiculos.map((versiculo) => (
-            <article 
+        <section class="space-y-6 mb-8" id="verses-section">
+          <h2 class="sr-only">Versiculos</h2>
+          {versiculosIniciales.map((versiculo) => (
+            <article
               id={`v${versiculo.numero}`}
-              class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border-l-4 border-blue-500 dark:border-blue-400"
+              class="verse-item bg-white/95 dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border-l-4 border-blue-500 dark:border-blue-400"
             >
               {versiculo.titulo && (
                 <h3 class="text-2xl font-bold text-blue-700 dark:text-blue-400 mb-4 border-b-2 border-blue-200 dark:border-blue-700 pb-2">
@@ -106,16 +141,17 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
                 </h3>
               )}
               <div class="flex items-start gap-4">
-                <span class="shrink-0 w-12 h-12 bg-blue-600 dark:bg-blue-700 text-white rounded-full flex items-center justify-center text-xl font-bold" aria-label={`Versículo ${versiculo.numero}`}>
+                <span
+                  class="shrink-0 w-12 h-12 bg-blue-600 dark:bg-blue-700 text-white rounded-full flex items-center justify-center text-xl font-bold"
+                  aria-label={`Versiculo ${versiculo.numero}`}
+                >
                   {versiculo.numero}
                 </span>
                 <div class="flex-1">
-                  <p class="text-xl text-gray-800 dark:text-gray-200 leading-relaxed mb-4">
-                    {versiculo.texto}
-                  </p>
+                  <p class="text-xl text-gray-800 dark:text-gray-200 leading-relaxed mb-4">{versiculo.texto}</p>
                   <div class="flex flex-wrap gap-2">
-                    <SpeechButton 
-                      text={`${versiculo.titulo ? versiculo.titulo + '. ' : ''}${libro.nombre} ${capituloNum} ${versiculo.numero}. ${versiculo.texto}`}
+                    <SpeechButton
+                      text={`${versiculo.titulo ? versiculo.titulo + ". " : ""}${libro.nombre} ${capituloNum} ${versiculo.numero}. ${versiculo.texto}`}
                       label="Escuchar"
                     />
                     <ShareButton
@@ -129,17 +165,34 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
               </div>
             </article>
           ))}
+
+          <div id="lazy-verses-root" class="space-y-6"></div>
         </section>
 
-        <!-- Navegación inferior -->
-        <nav class="flex justify-between items-center gap-4 py-8 border-t-2 border-gray-200" aria-label="Navegación entre capítulos">
+        {hasLazyLoad && (
+          <div class="mb-12 text-center">
+            <button
+              id="load-more-verses"
+              type="button"
+              class="inline-flex items-center gap-2 px-8 py-4 bg-amber-600 text-white rounded-lg hover:bg-amber-700 focus:ring-4 focus:ring-amber-300 transition-colors shadow-lg font-semibold"
+            >
+              <span aria-hidden="true">&#128220;</span>
+              Cargar mas versiculos
+            </button>
+            <p id="lazy-progress" class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+              Mostrando {initialVerseCount} de {totalVerses} versiculos
+            </p>
+          </div>
+        )}
+
+        <nav class="flex justify-between items-center gap-4 py-8 border-t-2 border-gray-200" aria-label="Navegacion entre capitulos">
           {capituloAnterior ? (
             <a
-              href={`/libro/${encodeURIComponent(nombre || '')}/${capituloAnterior}`}
+              href={`/libro/${libroSlug}/${capituloAnterior}`}
               class="btn-large inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors shadow-lg"
             >
-              <span class="text-2xl" aria-hidden="true">⬅️</span>
-              <span class="hidden sm:inline">Capítulo {capituloAnterior}</span>
+              <span class="text-2xl" aria-hidden="true">&#11013;</span>
+              <span class="hidden sm:inline">Capitulo {capituloAnterior}</span>
               <span class="sm:hidden">Anterior</span>
             </a>
           ) : (
@@ -148,12 +201,12 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
 
           {capituloSiguiente ? (
             <a
-              href={`/libro/${encodeURIComponent(nombre || '')}/${capituloSiguiente}`}
+              href={`/libro/${libroSlug}/${capituloSiguiente}`}
               class="btn-large inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors shadow-lg"
             >
-              <span class="hidden sm:inline">Capítulo {capituloSiguiente}</span>
+              <span class="hidden sm:inline">Capitulo {capituloSiguiente}</span>
               <span class="sm:hidden">Siguiente</span>
-              <span class="text-2xl" aria-hidden="true">➡️</span>
+              <span class="text-2xl" aria-hidden="true">&#10145;</span>
             </a>
           ) : (
             <div></div>
@@ -165,17 +218,16 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
 </Layout>
 
 <style>
-  /* Animación suave para los versículos */
   @media (prefers-reduced-motion: no-preference) {
-    article {
-      animation: slideUp 0.4s ease-out;
+    .verse-item {
+      animation: slideUp 0.35s ease-out;
     }
   }
 
   @keyframes slideUp {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(16px);
     }
     to {
       opacity: 1;
@@ -183,7 +235,6 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
     }
   }
 
-  /* Scroll suave */
   html {
     scroll-behavior: smooth;
   }
@@ -194,13 +245,13 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
     }
   }
 
-  /* Resaltar versículo objetivo */
   .verse-highlight {
     animation: highlight 2s ease-in-out;
   }
 
   @keyframes highlight {
-    0%, 100% {
+    0%,
+    100% {
       background-color: transparent;
     }
     50% {
@@ -209,32 +260,147 @@ const capituloSiguiente = libro && capituloNum < libro.capitulos.length ? capitu
   }
 </style>
 
-<script>
-  // Guardar progreso de lectura
+<script is:inline define:vars={{
+  libroNombre: libro?.nombre || "",
+  capituloNumero: capituloNum,
+  hasLazyLoad,
+  initialVerseCount,
+  totalVerses,
+  lazyChunkSize,
+  versiculosRestantesJSON,
+}}>
   try {
     const progress = {
-      libro: document.querySelector('h1')?.textContent?.replace(/\s+\d+$/, '').trim() || '',
-      capitulo: parseInt(window.location.pathname.split('/').pop() || '1', 10),
+      libro: libroNombre,
+      capitulo: capituloNumero,
       url: window.location.pathname,
       timestamp: Date.now(),
     };
-    localStorage.setItem('biblia-reading-progress', JSON.stringify(progress));
-  } catch { /* localStorage no disponible */ }
+    localStorage.setItem("biblia-reading-progress", JSON.stringify(progress));
+  } catch {}
 
-  // Hacer scroll al versículo si hay hash en la URL
-  if (window.location.hash) {
-    const hash = window.location.hash;
-    const element = document.querySelector(hash);
-    
-    if (element) {
-      setTimeout(() => {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        element.classList.add('verse-highlight');
-        
-        setTimeout(() => {
-          element.classList.remove('verse-highlight');
-        }, 2000);
-      }, 100);
+  function escapeHtml(value) {
+    return (value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function renderLazyVerse(versiculo) {
+    var speechId = "lazy-" + versiculo.numero + "-" + Math.random().toString(36).slice(2, 9);
+    var textForSpeech =
+      (versiculo.titulo ? versiculo.titulo + ". " : "") +
+      libroNombre +
+      " " +
+      capituloNumero +
+      " " +
+      versiculo.numero +
+      ". " +
+      versiculo.texto;
+
+    var sharePayload = JSON.stringify({
+      libro: libroNombre,
+      capitulo: capituloNumero,
+      versiculo: versiculo.numero,
+      texto: versiculo.texto,
+    });
+
+    return `
+      <article id="v${versiculo.numero}" class="verse-item bg-white/95 dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow border-l-4 border-blue-500 dark:border-blue-400">
+        ${
+          versiculo.titulo
+            ? `<h3 class="text-2xl font-bold text-blue-700 dark:text-blue-400 mb-4 border-b-2 border-blue-200 dark:border-blue-700 pb-2">${escapeHtml(versiculo.titulo)}</h3>`
+            : ""
+        }
+        <div class="flex items-start gap-4">
+          <span class="shrink-0 w-12 h-12 bg-blue-600 dark:bg-blue-700 text-white rounded-full flex items-center justify-center text-xl font-bold" aria-label="Versiculo ${versiculo.numero}">${versiculo.numero}</span>
+          <div class="flex-1">
+            <p class="text-xl text-gray-800 dark:text-gray-200 leading-relaxed mb-4">${escapeHtml(versiculo.texto)}</p>
+            <div class="flex flex-wrap gap-2">
+              <div class="flex flex-col gap-2">
+                <button type="button" class="btn-speech inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 transition-colors font-semibold text-lg" data-text="${escapeHtml(textForSpeech)}" data-speech-id="${speechId}" aria-label="Escuchar versiculo ${versiculo.numero}">
+                  <span class="text-2xl" aria-hidden="true">&#128266;</span>
+                  <span>Escuchar</span>
+                </button>
+                <button type="button" class="btn-stop-speech hidden items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition-colors font-semibold text-lg" data-speech-id="${speechId}" aria-label="Detener audio">
+                  <span class="text-2xl" aria-hidden="true">&#9209;</span>
+                  <span>Detener</span>
+                </button>
+              </div>
+              <button type="button" class="btn-share inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-800/40 focus:ring-2 focus:ring-purple-300 transition-colors font-semibold" data-share='${escapeHtml(sharePayload)}' aria-label="Compartir ${libroNombre} ${capituloNumero}:${versiculo.numero}">
+                <span aria-hidden="true">&#128279;</span>
+                <span>Compartir</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  var lazyRoot = document.getElementById("lazy-verses-root");
+  var loadMoreBtn = document.getElementById("load-more-verses");
+  var progress = document.getElementById("lazy-progress");
+  var remainingVerses = hasLazyLoad ? JSON.parse(versiculosRestantesJSON || "[]") : [];
+  var lazyPointer = 0;
+
+  function updateLazyProgress() {
+    if (!progress) return;
+    var loaded = initialVerseCount + lazyPointer;
+    progress.textContent = "Mostrando " + loaded + " de " + totalVerses + " versiculos";
+  }
+
+  function appendLazyChunk(size) {
+    if (!hasLazyLoad || !lazyRoot) return;
+    var limit = Math.min(lazyPointer + size, remainingVerses.length);
+    if (lazyPointer >= limit) return;
+
+    var html = "";
+    for (var i = lazyPointer; i < limit; i++) {
+      html += renderLazyVerse(remainingVerses[i]);
+    }
+    lazyRoot.insertAdjacentHTML("beforeend", html);
+    lazyPointer = limit;
+    updateLazyProgress();
+
+    if (loadMoreBtn && lazyPointer >= remainingVerses.length) {
+      loadMoreBtn.classList.add("hidden");
     }
   }
+
+  if (loadMoreBtn && hasLazyLoad) {
+    loadMoreBtn.addEventListener("click", function () {
+      appendLazyChunk(lazyChunkSize);
+    });
+  }
+
+  function ensureHashTargetLoadedAndScroll() {
+    if (!window.location.hash) return;
+    var match = window.location.hash.match(/^#v(\d+)$/);
+    if (!match) return;
+
+    var targetVerse = parseInt(match[1], 10);
+    if (!targetVerse || isNaN(targetVerse)) return;
+
+    if (hasLazyLoad && targetVerse > initialVerseCount) {
+      while (initialVerseCount + lazyPointer < targetVerse && lazyPointer < remainingVerses.length) {
+        appendLazyChunk(lazyChunkSize);
+      }
+    }
+
+    var element = document.querySelector(window.location.hash);
+    if (!element) return;
+
+    setTimeout(function () {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+      element.classList.add("verse-highlight");
+      setTimeout(function () {
+        element.classList.remove("verse-highlight");
+      }, 2000);
+    }, 100);
+  }
+
+  ensureHashTargetLoadedAndScroll();
 </script>

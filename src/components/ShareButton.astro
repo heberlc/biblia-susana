@@ -1,5 +1,4 @@
 ---
-// Botón de compartir versículo con Web Share API + fallback copiar enlace
 interface Props {
   libro: string;
   capitulo: number;
@@ -17,59 +16,72 @@ const shareData = JSON.stringify({ libro, capitulo, versiculo, texto });
   data-share={shareData}
   aria-label={`Compartir ${libro} ${capitulo}:${versiculo}`}
 >
-  <span aria-hidden="true">🔗</span>
+  <span aria-hidden="true">&#128279;</span>
   <span>Compartir</span>
 </button>
 
 <script>
+  type ShareWindow = Window & { __bibliaShareDelegated?: boolean };
+
+  function slugifyBookName(name: string): string {
+    return name
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .toLowerCase();
+  }
+
   function initShareButtons() {
-    document.querySelectorAll(".btn-share").forEach((btn) => {
-      btn.addEventListener("click", async (e) => {
-        const target = e.currentTarget as HTMLButtonElement;
-        const raw = target.dataset.share;
-        if (!raw) return;
+    const win = window as ShareWindow;
+    if (win.__bibliaShareDelegated) return;
+    win.__bibliaShareDelegated = true;
 
-        const data = JSON.parse(raw) as {
-          libro: string;
-          capitulo: number;
-          versiculo: number;
-          texto: string;
-        };
+    document.addEventListener("click", async (event) => {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
 
-        const url = `${window.location.origin}/libro/${encodeURIComponent(data.libro)}/${data.capitulo}#v${data.versiculo}`;
-        const shareText = `"${data.texto}" — ${data.libro} ${data.capitulo}:${data.versiculo}`;
+      const btn = target.closest(".btn-share") as HTMLButtonElement | null;
+      if (!btn) return;
 
-        // Intentar Web Share API
-        if (navigator.share) {
-          try {
-            await navigator.share({
-              title: `${data.libro} ${data.capitulo}:${data.versiculo}`,
-              text: shareText,
-              url,
-            });
-            return;
-          } catch {
-            // El usuario canceló o error, fallback a copiar
-          }
-        }
+      const raw = btn.dataset.share;
+      if (!raw) return;
 
-        // Fallback: copiar al portapapeles
+      const data = JSON.parse(raw) as {
+        libro: string;
+        capitulo: number;
+        versiculo: number;
+        texto: string;
+      };
+
+      const url = `${window.location.origin}/libro/${slugifyBookName(data.libro)}/${data.capitulo}#v${data.versiculo}`;
+      const shareText = `"${data.texto}" - ${data.libro} ${data.capitulo}:${data.versiculo}`;
+
+      if (navigator.share) {
         try {
-          await navigator.clipboard.writeText(`${shareText}\n${url}`);
-          // Feedback visual
-          const originalHTML = target.innerHTML;
-          target.innerHTML =
-            '<span aria-hidden="true">✅</span> <span>Copiado</span>';
-          target.classList.add("bg-green-100", "text-green-700");
-          setTimeout(() => {
-            target.innerHTML = originalHTML;
-            target.classList.remove("bg-green-100", "text-green-700");
-          }, 2000);
+          await navigator.share({
+            title: `${data.libro} ${data.capitulo}:${data.versiculo}`,
+            text: shareText,
+            url,
+          });
+          return;
         } catch {
-          // Sin permisos de portapapeles
-          prompt("Copia este enlace:", `${shareText}\n${url}`);
+          // fallback a copiar
         }
-      });
+      }
+
+      try {
+        await navigator.clipboard.writeText(`${shareText}\n${url}`);
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<span aria-hidden="true">&#9989;</span> <span>Copiado</span>';
+        btn.classList.add("bg-green-100", "text-green-700");
+        setTimeout(() => {
+          btn.innerHTML = originalHTML;
+          btn.classList.remove("bg-green-100", "text-green-700");
+        }, 2000);
+      } catch {
+        prompt("Copia este enlace:", `${shareText}\n${url}`);
+      }
     });
   }
 

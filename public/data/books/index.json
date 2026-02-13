@@ -1,0 +1,335 @@
+{
+  "version": "Reina-Valera 1960",
+  "libros": [
+    {
+      "nombre": "Génesis",
+      "slug": "genesis",
+      "capitulos": 50
+    },
+    {
+      "nombre": "Éxodo",
+      "slug": "exodo",
+      "capitulos": 40
+    },
+    {
+      "nombre": "Levítico",
+      "slug": "levitico",
+      "capitulos": 27
+    },
+    {
+      "nombre": "Números",
+      "slug": "numeros",
+      "capitulos": 36
+    },
+    {
+      "nombre": "Deuteronomio",
+      "slug": "deuteronomio",
+      "capitulos": 34
+    },
+    {
+      "nombre": "Josué",
+      "slug": "josue",
+      "capitulos": 24
+    },
+    {
+      "nombre": "Jueces",
+      "slug": "jueces",
+      "capitulos": 21
+    },
+    {
+      "nombre": "Rut",
+      "slug": "rut",
+      "capitulos": 4
+    },
+    {
+      "nombre": "1 Samuel",
+      "slug": "1-samuel",
+      "capitulos": 31
+    },
+    {
+      "nombre": "2 Samuel",
+      "slug": "2-samuel",
+      "capitulos": 24
+    },
+    {
+      "nombre": "1 Reyes",
+      "slug": "1-reyes",
+      "capitulos": 22
+    },
+    {
+      "nombre": "2 Reyes",
+      "slug": "2-reyes",
+      "capitulos": 25
+    },
+    {
+      "nombre": "1 Crónicas",
+      "slug": "1-cronicas",
+      "capitulos": 29
+    },
+    {
+      "nombre": "2 Crónicas",
+      "slug": "2-cronicas",
+      "capitulos": 36
+    },
+    {
+      "nombre": "Esdras",
+      "slug": "esdras",
+      "capitulos": 10
+    },
+    {
+      "nombre": "Nehemías",
+      "slug": "nehemias",
+      "capitulos": 13
+    },
+    {
+      "nombre": "Ester",
+      "slug": "ester",
+      "capitulos": 10
+    },
+    {
+      "nombre": "Job",
+      "slug": "job",
+      "capitulos": 42
+    },
+    {
+      "nombre": "Salmos",
+      "slug": "salmos",
+      "capitulos": 150
+    },
+    {
+      "nombre": "Proverbios",
+      "slug": "proverbios",
+      "capitulos": 31
+    },
+    {
+      "nombre": "Eclesiastés",
+      "slug": "eclesiastes",
+      "capitulos": 12
+    },
+    {
+      "nombre": "Cantares",
+      "slug": "cantares",
+      "capitulos": 8
+    },
+    {
+      "nombre": "Isaías",
+      "slug": "isaias",
+      "capitulos": 66
+    },
+    {
+      "nombre": "Jeremías",
+      "slug": "jeremias",
+      "capitulos": 52
+    },
+    {
+      "nombre": "Lamentaciones",
+      "slug": "lamentaciones",
+      "capitulos": 5
+    },
+    {
+      "nombre": "Ezequiel",
+      "slug": "ezequiel",
+      "capitulos": 48
+    },
+    {
+      "nombre": "Daniel",
+      "slug": "daniel",
+      "capitulos": 12
+    },
+    {
+      "nombre": "Oseas",
+      "slug": "oseas",
+      "capitulos": 14
+    },
+    {
+      "nombre": "Joel",
+      "slug": "joel",
+      "capitulos": 3
+    },
+    {
+      "nombre": "Amós",
+      "slug": "amos",
+      "capitulos": 9
+    },
+    {
+      "nombre": "Abdías",
+      "slug": "abdias",
+      "capitulos": 1
+    },
+    {
+      "nombre": "Jonás",
+      "slug": "jonas",
+      "capitulos": 4
+    },
+    {
+      "nombre": "Miqueas",
+      "slug": "miqueas",
+      "capitulos": 7
+    },
+    {
+      "nombre": "Nahúm",
+      "slug": "nahum",
+      "capitulos": 3
+    },
+    {
+      "nombre": "Habacuc",
+      "slug": "habacuc",
+      "capitulos": 3
+    },
+    {
+      "nombre": "Sofonías",
+      "slug": "sofonias",
+      "capitulos": 3
+    },
+    {
+      "nombre": "Hageo",
+      "slug": "hageo",
+      "capitulos": 2
+    },
+    {
+      "nombre": "Zacarías",
+      "slug": "zacarias",
+      "capitulos": 14
+    },
+    {
+      "nombre": "Malaquías",
+      "slug": "malaquias",
+      "capitulos": 4
+    },
+    {
+      "nombre": "Mateo",
+      "slug": "mateo",
+      "capitulos": 28
+    },
+    {
+      "nombre": "Marcos",
+      "slug": "marcos",
+      "capitulos": 16
+    },
+    {
+      "nombre": "Lucas",
+      "slug": "lucas",
+      "capitulos": 24
+    },
+    {
+      "nombre": "Juan",
+      "slug": "juan",
+      "capitulos": 21
+    },
+    {
+      "nombre": "Hechos",
+      "slug": "hechos",
+      "capitulos": 28
+    },
+    {
+      "nombre": "Romanos",
+      "slug": "romanos",
+      "capitulos": 16
+    },
+    {
+      "nombre": "1 Corintios",
+      "slug": "1-corintios",
+      "capitulos": 16
+    },
+    {
+      "nombre": "2 Corintios",
+      "slug": "2-corintios",
+      "capitulos": 13
+    },
+    {
+      "nombre": "Gálatas",
+      "slug": "galatas",
+      "capitulos": 6
+    },
+    {
+      "nombre": "Efesios",
+      "slug": "efesios",
+      "capitulos": 6
+    },
+    {
+      "nombre": "Filipenses",
+      "slug": "filipenses",
+      "capitulos": 4
+    },
+    {
+      "nombre": "Colosenses",
+      "slug": "colosenses",
+      "capitulos": 4
+    },
+    {
+      "nombre": "1 Tesalonicenses",
+      "slug": "1-tesalonicenses",
+      "capitulos": 5
+    },
+    {
+      "nombre": "2 Tesalonicenses",
+      "slug": "2-tesalonicenses",
+      "capitulos": 3
+    },
+    {
+      "nombre": "1 Timoteo",
+      "slug": "1-timoteo",
+      "capitulos": 6
+    },
+    {
+      "nombre": "2 Timoteo",
+      "slug": "2-timoteo",
+      "capitulos": 4
+    },
+    {
+      "nombre": "Tito",
+      "slug": "tito",
+      "capitulos": 3
+    },
+    {
+      "nombre": "Filemón",
+      "slug": "filemon",
+      "capitulos": 1
+    },
+    {
+      "nombre": "Hebreos",
+      "slug": "hebreos",
+      "capitulos": 13
+    },
+    {
+      "nombre": "Santiago",
+      "slug": "santiago",
+      "capitulos": 5
+    },
+    {
+      "nombre": "1 Pedro",
+      "slug": "1-pedro",
+      "capitulos": 5
+    },
+    {
+      "nombre": "2 Pedro",
+      "slug": "2-pedro",
+      "capitulos": 3
+    },
+    {
+      "nombre": "1 Juan",
+      "slug": "1-juan",
+      "capitulos": 5
+    },
+    {
+      "nombre": "2 Juan",
+      "slug": "2-juan",
+      "capitulos": 1
+    },
+    {
+      "nombre": "3 Juan",
+      "slug": "3-juan",
+      "capitulos": 1
+    },
+    {
+      "nombre": "Judas",
+      "slug": "judas",
+      "capitulos": 1
+    },
+    {
+      "nombre": "Apocalipsis",
+      "slug": "apocalipsis",
+      "capitulos": 22
+    }
+  ]
+}
