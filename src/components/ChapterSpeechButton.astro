@@ -319,15 +319,34 @@ const versiculosJSON = JSON.stringify(versiculos);
         }
         if (current) chunks.push(current);
 
-        // Fallback si quedo un bloque muy largo sin puntuacion
+        // Fallback si queda un bloque largo: dividir por palabras, no por caracteres
         var safeChunks = [];
         chunks.forEach(function (chunk) {
           if (chunk.length <= maxLen) {
             safeChunks.push(chunk);
             return;
           }
-          for (var j = 0; j < chunk.length; j += maxLen) {
-            safeChunks.push(chunk.slice(j, j + maxLen));
+
+          var words = chunk.split(/\s+/).filter(Boolean);
+          var currentWordChunk = "";
+          for (var j = 0; j < words.length; j++) {
+            var word = words[j];
+            var candidate = currentWordChunk
+              ? currentWordChunk + " " + word
+              : word;
+
+            if (candidate.length <= maxLen) {
+              currentWordChunk = candidate;
+            } else {
+              if (currentWordChunk) {
+                safeChunks.push(currentWordChunk);
+              }
+              // Si una palabra sola supera maxLen, se deja completa
+              currentWordChunk = word;
+            }
+          }
+          if (currentWordChunk) {
+            safeChunks.push(currentWordChunk);
           }
         });
 
