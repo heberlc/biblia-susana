@@ -3,6 +3,8 @@
 
 let synth: SpeechSynthesis | null = null;
 let currentUtterance: SpeechSynthesisUtterance | null = null;
+let wakeLockSentinel: any = null;
+let wakeLockVisibilityBound = false;
 
 // ====== Preferencias persistentes ======
 const STORAGE_KEYS = {
@@ -77,6 +79,42 @@ export function initSpeech(): void {
   }
 }
 
+async function acquireWakeLock(): Promise<void> {
+  if (typeof document === 'undefined' || typeof navigator === 'undefined') return;
+  if (!(navigator as any).wakeLock?.request) return;
+  if (document.visibilityState !== 'visible') return;
+  if (wakeLockSentinel) return;
+
+  try {
+    wakeLockSentinel = await (navigator as any).wakeLock.request('screen');
+    wakeLockSentinel.addEventListener?.('release', () => {
+      wakeLockSentinel = null;
+    });
+
+    if (!wakeLockVisibilityBound) {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && synth?.speaking && !synth?.paused) {
+          void acquireWakeLock();
+        }
+      });
+      wakeLockVisibilityBound = true;
+    }
+  } catch {
+    // Navegador no soporta Wake Lock o no se pudo adquirir
+  }
+}
+
+async function releaseWakeLock(): Promise<void> {
+  if (!wakeLockSentinel) return;
+  try {
+    await wakeLockSentinel.release();
+  } catch {
+    // Ignorar
+  } finally {
+    wakeLockSentinel = null;
+  }
+}
+
 // ====== TTS ======
 export function speechRead(text: string, onEnd?: () => void): void {
   if (!synth) return;
@@ -95,11 +133,17 @@ export function speechRead(text: string, onEnd?: () => void): void {
     currentUtterance.lang = voice.lang;
   }
 
-  if (onEnd) {
-    currentUtterance.onend = onEnd;
-  }
+  currentUtterance.onend = () => {
+    void releaseWakeLock();
+    onEnd?.();
+  };
+
+  currentUtterance.onerror = () => {
+    void releaseWakeLock();
+  };
 
   synth.speak(currentUtterance);
+  void acquireWakeLock();
 }
 
 export function speechStop(): void {
@@ -107,17 +151,20 @@ export function speechStop(): void {
     synth.cancel();
     currentUtterance = null;
   }
+  void releaseWakeLock();
 }
 
 export function speechPause(): void {
   if (synth && synth.speaking) {
     synth.pause();
   }
+  void releaseWakeLock();
 }
 
 export function speechResume(): void {
   if (synth && synth.paused) {
     synth.resume();
+    void acquireWakeLock();
   }
 }
 

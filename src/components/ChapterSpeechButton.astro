@@ -204,6 +204,7 @@ const versiculosJSON = JSON.stringify(versiculos);
       var currentChunkIndex = 0;
       var currentChunkRetryCount = 0;
       var lastSpeechActivityAt = 0;
+      var wakeLockSentinel = null;
 
       // Inicializar slider de velocidad
       var currentRate = getSavedRate();
@@ -340,6 +341,32 @@ const versiculosJSON = JSON.stringify(versiculos);
         }
       }
 
+      function acquireWakeLock() {
+        if (!("wakeLock" in navigator) || wakeLockSentinel) return;
+        if (document.visibilityState !== "visible") return;
+        navigator.wakeLock
+          .request("screen")
+          .then(function (sentinel) {
+            wakeLockSentinel = sentinel;
+            sentinel.addEventListener("release", function () {
+              wakeLockSentinel = null;
+            });
+          })
+          .catch(function () {
+            // Wake Lock no soportado o denegado
+          });
+      }
+
+      function releaseWakeLock() {
+        if (!wakeLockSentinel) return;
+        wakeLockSentinel
+          .release()
+          .catch(function () {})
+          .finally(function () {
+            wakeLockSentinel = null;
+          });
+      }
+
       function startRecoveryTimers() {
         stopRecoveryTimers();
         stallRecoveryTimer = setInterval(function () {
@@ -422,6 +449,7 @@ const versiculosJSON = JSON.stringify(versiculos);
           clearHighlight();
           updateButtons();
           stopRecoveryTimers();
+          releaseWakeLock();
           if (progressContainer) {
             setTimeout(function () {
               progressContainer.classList.add("hidden");
@@ -451,6 +479,7 @@ const versiculosJSON = JSON.stringify(versiculos);
         isPlaying = true;
         isPausedManually = false;
         updateButtons();
+        acquireWakeLock();
         speakVerse(0);
         startRecoveryTimers();
       });
@@ -465,6 +494,7 @@ const versiculosJSON = JSON.stringify(versiculos);
           window.speechSynthesis.pause();
           isPausedManually = true;
           updateButtons();
+          releaseWakeLock();
         }
       });
 
@@ -474,6 +504,7 @@ const versiculosJSON = JSON.stringify(versiculos);
           window.speechSynthesis.resume();
           isPausedManually = false;
           updateButtons();
+          acquireWakeLock();
         }
       });
 
@@ -488,6 +519,7 @@ const versiculosJSON = JSON.stringify(versiculos);
         clearHighlight();
         updateButtons();
         stopRecoveryTimers();
+        releaseWakeLock();
         if (progressContainer) progressContainer.classList.add("hidden");
       });
 
@@ -500,7 +532,15 @@ const versiculosJSON = JSON.stringify(versiculos);
         clearHighlight();
         updateButtons();
         stopRecoveryTimers();
+        releaseWakeLock();
         if (progressContainer) progressContainer.classList.add("hidden");
+      });
+
+      document.addEventListener("visibilitychange", function () {
+        if (!isPlaying || isPausedManually) return;
+        if (document.visibilityState === "visible") {
+          acquireWakeLock();
+        }
       });
     }
 
