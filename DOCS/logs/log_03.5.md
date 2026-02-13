@@ -33,3 +33,10 @@ Archivo: `src/components/ChapterSpeechButton.astro`
   - Iniciar lectura de capitulo completo en mobile.
   - Confirmar avance de versiculos sin corte prematuro.
   - Confirmar funcionamiento de Pausar/Continuar/Detener.
+
+## 6. Cambios de Fase 3 (UX) incluidos en este ciclo
+- **Guardar progreso de lectura:** `localStorage` con libro, capitulo, URL y timestamp para continuar desde la home.
+- **Versiculo del dia:** seleccion deterministica por dia del ano para mostrar un verso destacado.
+- **Compartir versiculos:** Web Share API en mobile + fallback a portapapeles en desktop.
+- **Breadcrumbs:** navegacion jerarquica en paginas de libro y capitulo.
+- **Busqueda por referencia directa:** deteccion de entradas tipo `Juan 3:16` y redireccion directa al versiculo.
