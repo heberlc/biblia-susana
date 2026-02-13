@@ -1,12 +1,12 @@
 ---
-// Componente de lectura de capítulo completo - versículo por versículo
+// Componente de lectura de capitulo completo - versiculo por versiculo
 // Con highlight, auto-scroll, progreso, y control de velocidad
 interface Props {
   versiculos: { numero: number; texto: string; titulo?: string }[];
   label?: string;
 }
 
-const { versiculos, label = "Leer capítulo completo" } = Astro.props;
+const { versiculos, label = "Leer capitulo completo" } = Astro.props;
 const uniqueId = `chapter-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 const versiculosJSON = JSON.stringify(versiculos);
 ---
@@ -20,28 +20,18 @@ const versiculosJSON = JSON.stringify(versiculos);
       id={`play-${uniqueId}`}
       aria-label={label}
     >
-      <span class="text-3xl" aria-hidden="true">▶️</span>
+      <span class="text-3xl" aria-hidden="true">&#9654;</span>
       <span>{label}</span>
     </button>
 
     <button
       type="button"
-      class="btn-pause-chapter hidden items-center gap-2 px-8 py-4 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 focus:ring-4 focus:ring-yellow-300 transition-colors font-semibold text-xl shadow-lg"
-      id={`pause-${uniqueId}`}
+      class="btn-toggle-chapter hidden items-center gap-2 px-8 py-4 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 focus:ring-4 focus:ring-yellow-300 transition-colors font-semibold text-xl shadow-lg"
+      id={`toggle-${uniqueId}`}
       aria-label="Pausar"
     >
-      <span class="text-3xl" aria-hidden="true">⏸️</span>
-      <span>Pausar</span>
-    </button>
-
-    <button
-      type="button"
-      class="btn-resume-chapter hidden items-center gap-2 px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors font-semibold text-xl shadow-lg"
-      id={`resume-${uniqueId}`}
-      aria-label="Continuar"
-    >
-      <span class="text-3xl" aria-hidden="true">▶️</span>
-      <span>Continuar</span>
+      <span class="toggle-icon text-3xl" aria-hidden="true">&#9208;</span>
+      <span class="toggle-label">Pausar</span>
     </button>
 
     <button
@@ -50,16 +40,16 @@ const versiculosJSON = JSON.stringify(versiculos);
       id={`stop-${uniqueId}`}
       aria-label="Detener"
     >
-      <span class="text-3xl" aria-hidden="true">⏹️</span>
+      <span class="text-3xl" aria-hidden="true">&#9209;</span>
       <span>Detener</span>
     </button>
   </div>
 
   <!-- Control de velocidad -->
-  <div class="flex items-center gap-3 flex-wrap">
+  <div class="speed-control-shell flex items-center gap-3 flex-wrap rounded-lg border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/70 px-3 py-2 shadow-sm">
     <label
       for={`speed-${uniqueId}`}
-      class="text-sm font-semibold text-gray-700 dark:text-gray-300"
+      class="speed-control-label text-sm font-semibold text-gray-700 dark:text-gray-300"
     >
       Velocidad:
     </label>
@@ -69,12 +59,12 @@ const versiculosJSON = JSON.stringify(versiculos);
       min="0.5"
       max="2.0"
       step="0.1"
-      class="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+      class="speed-slider w-36 sm:w-44 h-2 rounded-full appearance-none cursor-pointer"
       aria-label="Velocidad de lectura"
     />
     <span
       id={`speed-label-${uniqueId}`}
-      class="text-sm font-mono text-gray-600 dark:text-gray-400 min-w-12"
+      class="speed-value inline-flex items-center justify-center min-w-[3.4rem] px-2 py-1 rounded-md bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-sm font-mono font-semibold text-blue-700 dark:text-blue-300"
       >0.9x</span
     >
   </div>
@@ -103,7 +93,7 @@ const versiculosJSON = JSON.stringify(versiculos);
 
   <!-- Tip recomendando Edge -->
   <p class="text-xs text-gray-400 dark:text-gray-500 italic">
-    💡 Para mejor calidad de voz, usa Microsoft Edge
+    Para mejor calidad de voz, usa Microsoft Edge
   </p>
   <!-- Mini reproductor sticky para mobile -->
   <div
@@ -118,22 +108,13 @@ const versiculosJSON = JSON.stringify(versiculos);
       </div>
       <div class="flex items-center gap-2">
         <button
-          id={`sticky-pause-${uniqueId}`}
+          id={`sticky-toggle-${uniqueId}`}
           type="button"
           class="hidden flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-yellow-600 text-white rounded-lg font-semibold text-sm focus:ring-4 focus:ring-yellow-300"
           aria-label="Pausar lectura"
         >
-          <span aria-hidden="true">&#9208;</span>
-          Pausar
-        </button>
-        <button
-          id={`sticky-resume-${uniqueId}`}
-          type="button"
-          class="hidden flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg font-semibold text-sm focus:ring-4 focus:ring-blue-300"
-          aria-label="Continuar lectura"
-        >
-          <span aria-hidden="true">&#9654;</span>
-          Continuar
+          <span class="sticky-toggle-icon" aria-hidden="true">&#9208;</span>
+          <span class="sticky-toggle-label">Pausar</span>
         </button>
         <button
           id={`sticky-stop-${uniqueId}`}
@@ -197,7 +178,7 @@ const versiculosJSON = JSON.stringify(versiculos);
       var keywords = [
         "Neural",
         "Google",
-        "Mónica",
+        "Monica",
         "Paulina",
         "Jorge",
         "Microsoft",
@@ -211,7 +192,7 @@ const versiculosJSON = JSON.stringify(versiculos);
       return spanish[0];
     }
 
-    // Pre-cargar voces al inicio (móvil las carga async)
+    // Pre-cargar voces al inicio (movil las carga async)
     function preloadVoices() {
       window.speechSynthesis.getVoices();
       if (typeof window.speechSynthesis.onvoiceschanged !== "undefined") {
@@ -223,8 +204,7 @@ const versiculosJSON = JSON.stringify(versiculos);
 
     function initControls() {
       var playBtn = document.getElementById("play-" + controlsId);
-      var pauseBtn = document.getElementById("pause-" + controlsId);
-      var resumeBtn = document.getElementById("resume-" + controlsId);
+      var toggleBtn = document.getElementById("toggle-" + controlsId);
       var stopBtn = document.getElementById("stop-" + controlsId);
       var speedSlider = document.getElementById("speed-" + controlsId);
       var speedLabel = document.getElementById("speed-label-" + controlsId);
@@ -232,8 +212,7 @@ const versiculosJSON = JSON.stringify(versiculos);
       var progressBar = document.getElementById("progress-bar-" + controlsId);
       var progressText = document.getElementById("progress-text-" + controlsId);
       var stickyContainer = document.getElementById("sticky-" + controlsId);
-      var stickyPauseBtn = document.getElementById("sticky-pause-" + controlsId);
-      var stickyResumeBtn = document.getElementById("sticky-resume-" + controlsId);
+      var stickyToggleBtn = document.getElementById("sticky-toggle-" + controlsId);
       var stickyStopBtn = document.getElementById("sticky-stop-" + controlsId);
       var stickyProgressText = document.getElementById("sticky-progress-" + controlsId);
 
@@ -256,53 +235,101 @@ const versiculosJSON = JSON.stringify(versiculos);
       var currentRate = getSavedRate();
       if (speedSlider) {
         speedSlider.value = currentRate.toString();
+        speedSlider.style.setProperty(
+          "--speed-progress",
+          (((currentRate - 0.5) / 1.5) * 100).toFixed(2) + "%",
+        );
         speedLabel.textContent = currentRate.toFixed(1) + "x";
         speedSlider.addEventListener("input", function () {
           currentRate = parseFloat(speedSlider.value);
+          speedSlider.style.setProperty(
+            "--speed-progress",
+            (((currentRate - 0.5) / 1.5) * 100).toFixed(2) + "%",
+          );
           speedLabel.textContent = currentRate.toFixed(1) + "x";
           saveRate(currentRate);
         });
       }
 
+      function updateToggleButton() {
+        if (!toggleBtn) return;
+        var toggleIcon = toggleBtn.querySelector(".toggle-icon");
+        var toggleLabel = toggleBtn.querySelector(".toggle-label");
+
+        if (isPausedManually) {
+          toggleBtn.classList.remove(
+            "bg-yellow-600",
+            "hover:bg-yellow-700",
+            "focus:ring-yellow-300",
+          );
+          toggleBtn.classList.add(
+            "bg-blue-600",
+            "hover:bg-blue-700",
+            "focus:ring-blue-300",
+          );
+          toggleBtn.setAttribute("aria-label", "Continuar");
+          if (toggleIcon) toggleIcon.textContent = "▶";
+          if (toggleLabel) toggleLabel.textContent = "Continuar";
+        } else {
+          toggleBtn.classList.remove(
+            "bg-blue-600",
+            "hover:bg-blue-700",
+            "focus:ring-blue-300",
+          );
+          toggleBtn.classList.add(
+            "bg-yellow-600",
+            "hover:bg-yellow-700",
+            "focus:ring-yellow-300",
+          );
+          toggleBtn.setAttribute("aria-label", "Pausar");
+          if (toggleIcon) toggleIcon.textContent = "⏸";
+          if (toggleLabel) toggleLabel.textContent = "Pausar";
+        }
+      }
+
+      function updateStickyToggleButton() {
+        if (!stickyToggleBtn) return;
+        var stickyToggleIcon = stickyToggleBtn.querySelector(".sticky-toggle-icon");
+        var stickyToggleLabel = stickyToggleBtn.querySelector(".sticky-toggle-label");
+
+        if (isPausedManually) {
+          stickyToggleBtn.classList.remove("bg-yellow-600", "focus:ring-yellow-300");
+          stickyToggleBtn.classList.add("bg-blue-600", "focus:ring-blue-300");
+          stickyToggleBtn.setAttribute("aria-label", "Continuar lectura");
+          if (stickyToggleIcon) stickyToggleIcon.textContent = "▶";
+          if (stickyToggleLabel) stickyToggleLabel.textContent = "Continuar";
+        } else {
+          stickyToggleBtn.classList.remove("bg-blue-600", "focus:ring-blue-300");
+          stickyToggleBtn.classList.add("bg-yellow-600", "focus:ring-yellow-300");
+          stickyToggleBtn.setAttribute("aria-label", "Pausar lectura");
+          if (stickyToggleIcon) stickyToggleIcon.textContent = "⏸";
+          if (stickyToggleLabel) stickyToggleLabel.textContent = "Pausar";
+        }
+      }
+
       function updateButtons() {
-        if (isPlaying && !isPausedManually) {
+        updateToggleButton();
+        updateStickyToggleButton();
+
+        if (isPlaying || isPausedManually) {
           playBtn.classList.add("hidden");
-          pauseBtn.classList.remove("hidden");
-          pauseBtn.classList.add("inline-flex");
-          resumeBtn.classList.add("hidden");
-          resumeBtn.classList.remove("inline-flex");
+          toggleBtn.classList.remove("hidden");
+          toggleBtn.classList.add("inline-flex");
           stopBtn.classList.remove("hidden");
           stopBtn.classList.add("inline-flex");
 
           if (stickyContainer) stickyContainer.classList.remove("hidden");
-          if (stickyPauseBtn) stickyPauseBtn.classList.remove("hidden");
-          if (stickyResumeBtn) stickyResumeBtn.classList.add("hidden");
-          if (stickyStopBtn) stickyStopBtn.classList.remove("hidden");
-        } else if (isPausedManually) {
-          playBtn.classList.add("hidden");
-          pauseBtn.classList.add("hidden");
-          pauseBtn.classList.remove("inline-flex");
-          resumeBtn.classList.remove("hidden");
-          resumeBtn.classList.add("inline-flex");
-          stopBtn.classList.remove("hidden");
-          stopBtn.classList.add("inline-flex");
-
-          if (stickyContainer) stickyContainer.classList.remove("hidden");
-          if (stickyPauseBtn) stickyPauseBtn.classList.add("hidden");
-          if (stickyResumeBtn) stickyResumeBtn.classList.remove("hidden");
+          if (stickyToggleBtn) stickyToggleBtn.classList.remove("hidden");
           if (stickyStopBtn) stickyStopBtn.classList.remove("hidden");
         } else {
           playBtn.classList.remove("hidden");
-          pauseBtn.classList.add("hidden");
-          pauseBtn.classList.remove("inline-flex");
-          resumeBtn.classList.add("hidden");
-          resumeBtn.classList.remove("inline-flex");
+          toggleBtn.classList.add("hidden");
+          toggleBtn.classList.remove("inline-flex");
           stopBtn.classList.add("hidden");
           stopBtn.classList.remove("inline-flex");
 
           if (stickyContainer) stickyContainer.classList.add("hidden");
-          if (stickyPauseBtn) stickyPauseBtn.classList.add("hidden");
-          if (stickyResumeBtn) stickyResumeBtn.classList.add("hidden");
+          if (stickyToggleBtn) stickyToggleBtn.classList.add("hidden");
           if (stickyStopBtn) stickyStopBtn.classList.add("hidden");
         }
       }
@@ -325,7 +352,7 @@ const versiculosJSON = JSON.stringify(versiculos);
           el.classList.remove("verse-highlight");
         });
 
-        // Agregar highlight al versículo actual
+        // Agregar highlight al versiculo actual
         var verseEl = document.getElementById("v" + verseNum);
         if (verseEl) {
           verseEl.classList.add("verse-highlight");
@@ -526,7 +553,7 @@ const versiculosJSON = JSON.stringify(versiculos);
 
       function speakVerse(index) {
         if (!isPlaying || index >= verses.length) {
-          // Terminó la lectura
+          // Termino la lectura
           isPlaying = false;
           isPausedManually = false;
           clearHighlight();
@@ -553,7 +580,7 @@ const versiculosJSON = JSON.stringify(versiculos);
       }
 
       // Chrome mobile workaround: speech se pausa silenciosamente tras ~15s
-      // Play — speakVerse DEBE llamarse síncronamente desde el click (user gesture)
+      // Play - speakVerse DEBE llamarse sincronamente desde el click (user gesture)
       playBtn.addEventListener("click", function () {
         if (!window.speechSynthesis || verses.length === 0) return;
 
@@ -567,7 +594,7 @@ const versiculosJSON = JSON.stringify(versiculos);
         startRecoveryTimers();
       });
 
-      function pauseChapter() {
+      function togglePauseResume() {
         if (
           window.speechSynthesis &&
           window.speechSynthesis.speaking &&
@@ -577,11 +604,7 @@ const versiculosJSON = JSON.stringify(versiculos);
           isPausedManually = true;
           updateButtons();
           releaseWakeLock();
-        }
-      }
-
-      function resumeChapter() {
-        if (window.speechSynthesis && isPausedManually) {
+        } else if (window.speechSynthesis && isPausedManually) {
           window.speechSynthesis.resume();
           isPausedManually = false;
           updateButtons();
@@ -603,12 +626,10 @@ const versiculosJSON = JSON.stringify(versiculos);
         if (progressContainer) progressContainer.classList.add("hidden");
       }
 
-      // Pause / Resume / Stop
-      pauseBtn.addEventListener("click", pauseChapter);
-      resumeBtn.addEventListener("click", resumeChapter);
+      // Pause/Resume (toggle) / Stop
+      toggleBtn.addEventListener("click", togglePauseResume);
       stopBtn.addEventListener("click", stopChapter);
-      stickyPauseBtn?.addEventListener("click", pauseChapter);
-      stickyResumeBtn?.addEventListener("click", resumeChapter);
+      stickyToggleBtn?.addEventListener("click", togglePauseResume);
       stickyStopBtn?.addEventListener("click", stopChapter);
 
       // Escuchar evento de lectura de un verso individual
@@ -658,5 +679,59 @@ const versiculosJSON = JSON.stringify(versiculos);
     background-color: rgba(34, 197, 94, 0.1);
     border-left-color: #4ade80;
   }
-</style>
 
+  .speed-slider {
+    --speed-progress: 26.67%;
+    border: 0;
+    outline: none;
+    background: linear-gradient(
+      to right,
+      #2563eb 0%,
+      #2563eb var(--speed-progress),
+      #e5e7eb var(--speed-progress),
+      #e5e7eb 100%
+    );
+    box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.14);
+  }
+
+  .dark .speed-slider {
+    background: linear-gradient(
+      to right,
+      #3b82f6 0%,
+      #3b82f6 var(--speed-progress),
+      #334155 var(--speed-progress),
+      #334155 100%
+    );
+    box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.26);
+  }
+
+  .speed-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 9999px;
+    background: #2563eb;
+    border: 2px solid #f8fafc;
+    box-shadow: 0 2px 10px rgba(37, 99, 235, 0.4);
+    transition: transform 0.15s ease;
+  }
+
+  .speed-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.08);
+  }
+
+  .speed-slider::-moz-range-thumb {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 9999px;
+    background: #2563eb;
+    border: 2px solid #f8fafc;
+    box-shadow: 0 2px 10px rgba(37, 99, 235, 0.4);
+    transition: transform 0.15s ease;
+  }
+
+  .speed-slider::-moz-range-thumb:hover {
+    transform: scale(1.08);
+  }
+</style>

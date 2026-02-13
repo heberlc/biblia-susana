@@ -66,13 +66,11 @@ const uniqueId = `speech-${Date.now()}-${Math.random().toString(36).substring(2,
     const chapterControls = document.querySelectorAll('[id^="controls-chapter-"]');
     chapterControls.forEach((container) => {
       const playBtn = container.querySelector(".btn-play-chapter");
-      const pauseBtn = container.querySelector(".btn-pause-chapter");
-      const resumeBtn = container.querySelector(".btn-resume-chapter");
+      const toggleBtn = container.querySelector(".btn-toggle-chapter");
       const stopBtn = container.querySelector(".btn-stop-chapter");
 
       playBtn?.classList.remove("hidden");
-      pauseBtn?.classList.add("hidden");
-      resumeBtn?.classList.add("hidden");
+      toggleBtn?.classList.add("hidden");
       stopBtn?.classList.add("hidden");
     });
 
